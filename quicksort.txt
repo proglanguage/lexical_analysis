@@ -1,0 +1,35 @@
+procedure quicksort(int[] array, int initial, int final)
+  int i, j, x, aux
+
+  i, j = initial, final
+  x = array[(initial + final) / 2]
+
+  while i <= j do
+    
+    while array[i] < x do
+      i++
+    end_while
+    
+    while array[j] > x di
+      j--
+    end_while
+    
+    if i <= j then
+      aux = array[i]
+      array[i] = array[j]
+      array[j] = aux
+      i++
+      j--
+    end_if
+    
+  end_while
+
+  if initial < j then
+    quicksort(array, initial, j)
+  end_if
+
+  if i < final then
+    quicksort(array, i, final)
+  end_if
+
+end_procedure
