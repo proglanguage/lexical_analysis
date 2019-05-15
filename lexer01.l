@@ -1,64 +1,65 @@
 %{
    #include "y.tab.h"
+   int yycolno = 0;
 %}
 
 %%
 
-^[ |\t]*\n                {/* Ignore any blank line*/};
+^[ |\t]*[\n\r]            {/* Ignore any blank line*/ yycolno=0;}
 
-","                       {return(COMMA);}
-"."                       {return(DOT);}
-[\n;]                     {return(END);}
-"+"                       {return(PLUS);}
-"-"                       {return(MINUS);}
-"*"                       {return(TIMES);}
-"/"                       {return(DIVIDE);}
-"^"                       {return(POWER);}
-"("                       {return(LEFT_PARENTHESIS);}
-")"                       {return(RIGHT_PARENTHESIS);}
-"["                       {return(LEFT_BRACKET);}
-"]"                       {return(RIGHT_BRACKET);}
-"{"                       {return(LEFT_KEY);}
-"}"                       {return(RIGHT_KEY);}
-"<="                      {return(LESS_EQ);}
-">="                      {return(BIG_EQ);}
-"<"                       {return(LESS);}
-">"                       {return(BIG);}
-"="                       {return(ASSIGN);}
-"=="                      {return(EQ);}
-"procedure"               {return(PROCEDURE);}
-"end_procedure"           {return(END_PROCEDURE);}
-"if"                      {return(IF);}
-"then"                    {return(THEN);}
-"end_if"                  {return(END_IF);}
-"else"                    {return(ELSE);}
-"do"                      {return(DO);}
-"while"                   {return(WHILE);}
-"end_while"               {return(END_WHILE);}
-"for"                     {return(FOR);}
-"end_for"                 {return(END_FOR);}
-"int"                     {return(INTEGER);}
-"char"                    {return(CHAR);}
-"str"                     {return(STRING);}
+","                       {yycolno++;return(COMMA);}
+"."                       {yycolno++;return(DOT);}
+[\n\r;]                   {yycolno++;return(END);}
+"+"                       {yycolno++;return(PLUS);}
+"-"                       {yycolno++;return(MINUS);}
+"*"                       {yycolno++;return(TIMES);}
+"/"                       {yycolno++;return(DIVIDE);}
+"^"                       {yycolno++;return(POWER);}
+"("                       {yycolno++;return(LEFT_PARENTHESIS);}
+")"                       {yycolno++;return(RIGHT_PARENTHESIS);}
+"["                       {yycolno++;return(LEFT_BRACKET);}
+"]"                       {yycolno++;return(RIGHT_BRACKET);}
+"{"                       {yycolno++;return(LEFT_KEY);}
+"}"                       {yycolno++;return(RIGHT_KEY);}
+"<="                      {yycolno++;return(LESS_EQ);}
+">="                      {yycolno++;return(BIG_EQ);}
+"<"                       {yycolno++;return(LESS);}
+">"                       {yycolno++;return(BIG);}
+"="                       {yycolno++;return(ASSIGN);}
+"=="                      {yycolno++;return(EQ);}
+"procedure"               {yycolno++;return(PROCEDURE);}
+"end_procedure"           {yycolno++;return(END_PROCEDURE);}
+"if"                      {yycolno++;return(IF);}
+"then"                    {yycolno++;return(THEN);}
+"end_if"                  {yycolno++;return(END_IF);}
+"else"                    {yycolno++;return(ELSE);}
+"do"                      {yycolno++;return(DO);}
+"while"                   {yycolno++;return(WHILE);}
+"end_while"               {yycolno++;return(END_WHILE);}
+"for"                     {yycolno++;return(FOR);}
+"end_for"                 {yycolno++;return(END_FOR);}
+"int"                     {yycolno++;return(INTEGER);}
+"char"                    {yycolno++;return(CHAR);}
+"str"                     {yycolno++;return(STRING);}
 "#.*"                     {yylval.sValue = strdup(yytext);
-                           return(BEGIN_COMMENT);}
+                           yycolno++;return(BEGIN_COMMENT);}
 
 "\".*\""                  {yylval.sValue = strdup(yytext);
-                           return(STRING_VAL);}
+                           yycolno++;return(STRING_VAL);}
 
 "\'.\'"                   {yylval.cValue = yytext[1];
-                           return(CHAR_VAL);}
+                           yycolno++;return(CHAR_VAL);}
 
 [0-9]+                    {yylval.iValue = atoi(yytext);
-                           return(NUMBER);}
+                           yycolno++;return(NUMBER);}
 
 [a-zA-Z][a-zA-Z0-9_]*     {yylval.sValue = strdup(yytext);
-                           return(ID);}
+                           yycolno++;return(ID);}
 
-[\t]                      {return(INDENT);}
-[ ]{2,4}                  {return(INDENT);}
+[\t]                      {yycolno++;return(INDENT);}
+[ ]{2,4}                  {yycolno++;return(INDENT);}
 
-[ ]                       {/* Ignore white spaces */};
+[ ]                       {/* Ignore white spaces */yycolno++;}
 
 %%
 

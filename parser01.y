@@ -19,7 +19,7 @@ int yylex(void);
 int yyerror(char *s);
 extern int yylineno;
 extern char * yytext;
-
+extern int yycolno;
 
 node *mknode(node *left, node *right, int tokcode, char *token);
 void printtree(node *tree);
@@ -69,7 +69,8 @@ void generate(node *tree);
 
 %start lines
 
-%type <npValue> stmlist stm exp term alias
+ /* %left INTEGER CHAR STRING */
+%type <npValue> stmlist stm exp term block ass type declaration alias paramslist param array
 
 %%
 
@@ -82,24 +83,53 @@ line  : coment  {}
                  generate($1);}
       ;
 
-coment : BEGIN_COMMENT END    {}
+coment : BEGIN_COMMENT END      {}
 
-stmlist : stm                 {$$ = $1;}
-        | stmlist END stm     {$$ = $3;}
+stmlist : stm END               {$$ = $1;}
+        | stmlist END stm END       {$$ = $3;}
         ;
 
-stm : exp                                                 {$$ = $1;}
-    | WHILE stm DO END stmlist END_WHILE END              {$$ = mknode( $2, $5, WHILE, "while");}
-    | LEFT_PARENTHESIS stmlist RIGHT_PARENTHESIS          {$$ = $2;}
-    | LEFT_BRACKET stmlist RIGHT_BRACKET                  {$$ = $2;}
-    | LEFT_KEY stmlist RIGHT_KEY                          {$$ = $2;}
-    | IF stm THEN END stmlist END_IF END                  {$$ = mknode( $2, $5, IF, "if");}
-    | IF stm THEN END stmlist ELSE END stmlist END_IF END {$$ = mknode( $5, $8, ELSE, "if");}
-    | stm COMMA stmlist END                               {$$ = mknode( $1, $3, COMMA, ",");}
+stm : ass                                                                                    {$$ = $1;}
+    | WHILE stm DO END stmlist END_WHILE                                                     {$$ = mknode( $2, $5, WHILE, "while");}
+    | LEFT_PARENTHESIS stmlist RIGHT_PARENTHESIS                                             {$$ = $2;}
+    | LEFT_BRACKET stmlist RIGHT_BRACKET                                                     {$$ = $2;}
+    | LEFT_KEY stmlist RIGHT_KEY                                                             {$$ = $2;}
+    | IF stm THEN END block END_IF                                                           {$$ = mknode( $2, $5, IF, "if");}
+    | IF stm THEN END block ELSE END block END_IF                                            {$$ = mknode( $5, $8, ELSE, "if");}
+    | PROCEDURE alias LEFT_PARENTHESIS paramslist RIGHT_PARENTHESIS END block END_PROCEDURE  {$$ = mknode( $2, $4, PROCEDURE, "procedure");}
+    | block                                                                                  {$$ = $1;}
+    | declaration                                                                            {$$ = $1;}
     ;
 
+declaration : type param
+            ;
+
+ass : alias ASSIGN exp {$$ = mknode($1,$3,ID,"assignment");}
+    ;
+
+block : INDENT stmlist END {$$ = $2;}
+      ;
+
+paramslist :                                {$$ = mknode( 0, 0,ID,"params");}
+           | type param                     {$$ = mknode($1,$2,ID,"params");}
+           | paramslist COMMA type param    {$$ = mknode($3,$4,ID,"params");}
+           ;
+
+param : ass           {$$ = $1;}
+      | alias         {$$ = $1;}
+      | array alias   {$$ = mknode($1,$2,ID,"array");}
+      ;
+
+array : LEFT_BRACKET RIGHT_BRACKET        {$$ = mknode( 0, 0,ID,"array");}
+      | LEFT_BRACKET term RIGHT_BRACKET   {$$ = mknode( 0,$2,ID,"array");}
+      ;
+
+type : INTEGER {$$ = mknode( 0, 0, INTEGER, "int");}
+     | CHAR    {$$ = mknode( 0, 0, CHAR, "char");}
+     | STRING  {$$ = mknode( 0, 0, STRING, "str");}
+     ;
+
 exp : term
-    | alias ASSIGN exp END        {$$ = mknode($1, $3, ASSIGN, "=");}
     | exp PLUS term            {$$ = mknode($1, $3, PLUS, "+");}
     | exp TIMES term           {$$ = mknode($1, $3, TIMES, "*");}
     | exp DIVIDE term          {$$ = mknode($1, $3, DIVIDE, "/");}
@@ -117,16 +147,14 @@ alias : ID                    {char *str = (char *) malloc(10);
                                $$ = mknode( 0, 0, ID, str);}
       ;
 
-term : ID                      {char *str = (char *) malloc(10);
-                               sprintf(str, "%s", $1);
-                               $$ = mknode( 0, 0, ID, str);}
-     | NUMBER                  {char *str = (char *) malloc(10);
+term : alias                  {$$ = $1;}
+     | NUMBER                 {char *str = (char *) malloc(10);
                                sprintf(str, "%i", $1);
                                $$ = mknode( 0, 0, NUMBER, str);}
-     | CHAR_VAL                {char *str = (char *) malloc(2);
+     | CHAR_VAL               {char *str = (char *) malloc(2);
                                sprintf(str, "%c", $1);
                                $$ = mknode( 0, 0, CHAR_VAL, str);}
-     | STRING_VAL              {char *str = (char *) malloc(100);
+     | STRING_VAL             {char *str = (char *) malloc(100);
                                sprintf(str, "%s", $1);
                                $$ = mknode( 0, 0, STRING_VAL, str);}
      ;
@@ -138,7 +166,7 @@ int main (void) {
 }
 
 int yyerror (char *msg) {
-  fprintf (stderr, "%d: %s at '%s'\n", yylineno, msg, yytext);
+  fprintf (stderr, "%d: %s at '%s' in col %d\n", yylineno, msg, yytext, yycolno);
   return 0;
 }
 
