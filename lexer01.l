@@ -1,53 +1,62 @@
- /* %{
-  * #include "y.tab.h"
-  * %}
-  */
+%{
+   #include "y.tab.h"
+%}
 
 %%
 
 ^[ |\t]*\n                {/* Ignore any blank line*/};
 
-";"                       {printf("SEMICOLON ");/* return(SEMICOLON); */}
-","                       {printf("COMMA ");/* return(COMMA); */}
-"."                       {printf("DOT ");/* return(DOT); */}
-[\n;]                     {printf("END_STMT\n");/* return(END); */}
-"+"                       {printf("PLUS ");/* return(PLUS); */}
-"-"                       {printf("MINUS ");/* return(MINUS); */}
-"*"                       {printf("TIMES ");/* return(TIMES); */}
-"/"                       {printf("DIVIDE ");/* return(DIVIDE); */}
-"^"                       {printf("POWER ");/* return(POWER); */}
-"("                       {printf("LEFT_PARENTHESIS ");/* return(LEFT_PARENTHESIS); */}
-")"                       {printf("RIGHT_PARENTHESIS ");/* return(RIGHT_PARENTHESIS); */}
-"["                       {printf("LEFT_BRACKET ");/* return(LEFT_BRACKET); */}
-"]"                       {printf("RIGHT_BRACKET ");/* return(RIGHT_BRACKET); */}
-"{"                       {printf("LEFT_KEY ");/* return(LEFT_KEY); */}
-"}"                       {printf("RIGHT_KEY ");/* return(RIGHT_KEY); */}
-"<="                      {printf("LESS_EQ ");/* return(LESS_EQ); */}
-">="                      {printf("BIG_EQ ");/* return(BIG_EQ); */}
-"<"                       {printf("LESS ");/* return(LESS); */}
-">"                       {printf("BIG ");/* return(BIG); */}
-"="                       {printf("EQ ");/* return(EQ); */}
-"procedure"               {printf("PROCEDURE ");/* return(PROCEDURE); */}
-"end_procedure"           {printf("END_PROCEDURE ");/* return(END_PROCEDURE) */}
-"if"                      {printf("IF ");/* return(IF); */}
-"then"                    {printf("THEN ");/* return(THEN); */}
-"end_if"                  {printf("END_IF ");/* return(END_IF) */}
-"else"                    {printf("ELSE ");/* return(ELSE); */}
-"do"                      {printf("DO ");/* return(DO); */}
-"while"                   {printf("WHILE ");/* return(WHILE); */}
-"end_while"               {printf("END_WHILE ");/* return(END_WHILE) */}
-"for"                     {printf("FOR ");/* return(FOR); */}
-"end_for"                 {printf("END_FOR ");/* return(END_FOR) */}
-"int"                     {printf("INTEGER ");/* return(INTEGER); */}
+","                       {return(COMMA);}
+"."                       {return(DOT);}
+[\n;]                     {return(END);}
+"+"                       {return(PLUS);}
+"-"                       {return(MINUS);}
+"*"                       {return(TIMES);}
+"/"                       {return(DIVIDE);}
+"^"                       {return(POWER);}
+"("                       {return(LEFT_PARENTHESIS);}
+")"                       {return(RIGHT_PARENTHESIS);}
+"["                       {return(LEFT_BRACKET);}
+"]"                       {return(RIGHT_BRACKET);}
+"{"                       {return(LEFT_KEY);}
+"}"                       {return(RIGHT_KEY);}
+"<="                      {return(LESS_EQ);}
+">="                      {return(BIG_EQ);}
+"<"                       {return(LESS);}
+">"                       {return(BIG);}
+"="                       {return(ASSIGN);}
+"=="                      {return(EQ);}
+"procedure"               {return(PROCEDURE);}
+"end_procedure"           {return(END_PROCEDURE);}
+"if"                      {return(IF);}
+"then"                    {return(THEN);}
+"end_if"                  {return(END_IF);}
+"else"                    {return(ELSE);}
+"do"                      {return(DO);}
+"while"                   {return(WHILE);}
+"end_while"               {return(END_WHILE);}
+"for"                     {return(FOR);}
+"end_for"                 {return(END_FOR);}
+"int"                     {return(INTEGER);}
+"char"                    {return(CHAR);}
+"str"                     {return(STRING);}
+"#.*"                     {yylval.sValue = strdup(yytext);
+                           return(BEGIN_COMMENT);}
 
-[0-9]+                    {/* yylval.iValue = atoi(yytext); */
-                           printf("NUMBER(%s) ", yytext); /* return NUMBER; */}
+"\".*\""                  {yylval.sValue = strdup(yytext);
+                           return(STRING_VAL);}
 
-[a-z][a-z0-9_]*           {/* sprintf(yylval.sValue,"%s",yytext); */
-                           printf("ID(%s) ", yytext); /* return ID; */}
+"\'.\'"                   {yylval.cValue = yytext[1];
+                           return(CHAR_VAL);}
 
-[\t]                      {printf("INDENT ");/* return(INDENT); */}
-[ ]{2,4}                  {printf("INDENT ");/* return(INDENT); */}
+[0-9]+                    {yylval.iValue = atoi(yytext);
+                           return(NUMBER);}
+
+[a-zA-Z][a-zA-Z0-9_]*     {yylval.sValue = strdup(yytext);
+                           return(ID);}
+
+[\t]                      {return(INDENT);}
+[ ]{2,4}                  {return(INDENT);}
 
 [ ]                       {/* Ignore white spaces */};
 
@@ -57,8 +66,10 @@
     int yywrap (void) {return 1;}
 #endif
 
+/*
 int main(void)
 {
   yylex();
   return 0;
 }
+*/
