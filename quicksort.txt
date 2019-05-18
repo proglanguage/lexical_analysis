@@ -1,7 +1,8 @@
 procedure quicksort(int[] array, int initial, int final)
   int i, j, x, aux
 
-  i, j = initial, final
+  i = initial
+  j = final
   x = array[(initial + final) / 2]
 
   while i <= j do

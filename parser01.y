@@ -52,7 +52,7 @@ void generate(node *tree);
  /* %token SEMICOLON */
 
  /*CONTROL STRUCTURES*/
-%token PROCEDURE END_PROCEDURE IF THEN ELSE END_IF
+%token PROCEDURE END_PROCEDURE FUNCTION END_FUNCTION IF THEN ELSE END_IF
 %token DO WHILE END_WHILE FOR END_FOR
 
  /* OPERATORS */
@@ -66,11 +66,10 @@ void generate(node *tree);
 %token STRING
 
  /* %start prog */
-
 %start lines
 
  /* %left INTEGER CHAR STRING */
-%type <npValue> stmlist stm exp term block ass type declaration alias paramslist param array
+%type <npValue> stms stm exp term block type ids params param array // declare
 
 %%
 
@@ -78,76 +77,87 @@ lines :
       | lines line
 
 line  : coment  {}
-      | stmlist {printtree($1);
-                 printf("\n");
-                 generate($1);}
+      | stms    {}
       ;
 
 coment : BEGIN_COMMENT END      {}
 
-stmlist : stm END               {$$ = $1;}
-        | stmlist END stm END       {$$ = $3;}
+stms : stm END                {}
+     | stms END stm END       {}
+     ;
+
+stm : declare                                                               {}
+    | block                                                                 {}
+    | structs                                                               {}
+    ;
+
+structs : PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS END block END_PROCEDURE            {}
+        | PROCEDURE ID LEFT_PARENTHESIS RIGHT_PARENTHESIS END block END_PROCEDURE                   {}
+        | FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS END block END_FUNCTION              {}
+        | FUNCTION ID LEFT_PARENTHESIS RIGHT_PARENTHESIS END block END_FUNCTION                     {}
+        | WHILE stm DO END stms END_WHILE                                       {}
+        | IF stm THEN END block END_IF                                          {}
+        | IF stm THEN END block ELSE END block END_IF                           {}
         ;
 
-stm : ass                                                                                    {$$ = $1;}
-    | WHILE stm DO END stmlist END_WHILE                                                     {$$ = mknode( $2, $5, WHILE, "while");}
-    | LEFT_PARENTHESIS stmlist RIGHT_PARENTHESIS                                             {$$ = $2;}
-    | LEFT_BRACKET stmlist RIGHT_BRACKET                                                     {$$ = $2;}
-    | LEFT_KEY stmlist RIGHT_KEY                                                             {$$ = $2;}
-    | IF stm THEN END block END_IF                                                           {$$ = mknode( $2, $5, IF, "if");}
-    | IF stm THEN END block ELSE END block END_IF                                            {$$ = mknode( $5, $8, ELSE, "if");}
-    | PROCEDURE alias LEFT_PARENTHESIS paramslist RIGHT_PARENTHESIS END block END_PROCEDURE  {$$ = mknode( $2, $4, PROCEDURE, "procedure");}
-    | block                                                                                  {$$ = $1;}
-    | declaration                                                                            {$$ = $1;}
+block : INDENT stms                                           {}
+      | LEFT_PARENTHESIS stms RIGHT_PARENTHESIS               {}
+      | LEFT_BRACKET stms RIGHT_BRACKET                       {}
+      | LEFT_KEY stms RIGHT_KEY                               {}
+      ;
+
+params : types param                 {}
+       | params COMMA types param    {}
+       ;
+
+param : ids                    {}
+      | ids ASSIGN exps        {}
+      ;
+
+/* assign : ids ASSIGN exps        {}
+       ;*/
+
+ids : ID                  {}
+    | ids COMMA ID        {}
+    /* | ID array            {}
+    | ids COMMA ID array  {} */
     ;
 
-declaration : type param
-            ;
+declare : types ids       {}
+        ;
 
-ass : alias ASSIGN exp {$$ = mknode($1,$3,ID,"assignment");}
-    ;
-
-block : INDENT stmlist END {$$ = $2;}
-      ;
-
-paramslist :                                {$$ = mknode( 0, 0,ID,"params");}
-           | type param                     {$$ = mknode($1,$2,ID,"params");}
-           | paramslist COMMA type param    {$$ = mknode($3,$4,ID,"params");}
-           ;
-
-param : ass           {$$ = $1;}
-      | alias         {$$ = $1;}
-      | array alias   {$$ = mknode($1,$2,ID,"array");}
-      ;
-
-array : LEFT_BRACKET RIGHT_BRACKET        {$$ = mknode( 0, 0,ID,"array");}
-      | LEFT_BRACKET term RIGHT_BRACKET   {$$ = mknode( 0,$2,ID,"array");}
-      ;
-
-type : INTEGER {$$ = mknode( 0, 0, INTEGER, "int");}
-     | CHAR    {$$ = mknode( 0, 0, CHAR, "char");}
-     | STRING  {$$ = mknode( 0, 0, STRING, "str");}
+exps : exp              {}
+     | exps COMMA exp   {}
      ;
 
 exp : term
-    | exp PLUS term            {$$ = mknode($1, $3, PLUS, "+");}
-    | exp TIMES term           {$$ = mknode($1, $3, TIMES, "*");}
-    | exp DIVIDE term          {$$ = mknode($1, $3, DIVIDE, "/");}
-    | exp MINUS term           {$$ = mknode($1, $3, MINUS, "-");}
-    | exp POWER term           {$$ = mknode($1, $3, POWER, "^");}
-    | exp LESS term            {$$ = mknode($1, $3, LESS, "<");}
-    | exp LESS_EQ term         {$$ = mknode($1, $3, LESS_EQ, "<=");}
-    | exp BIG term             {$$ = mknode($1, $3, BIG, ">");}
-    | exp BIG_EQ term          {$$ = mknode($1, $3, BIG_EQ, ">=");}
-    | exp EQ term              {$$ = mknode($1, $3, EQ, "==");}
+    | exp PLUS term            {}
+    | exp TIMES term           {}
+    | exp DIVIDE term          {}
+    | exp MINUS term           {}
+    | exp POWER term           {}
+    | exp LESS term            {}
+    | exp LESS_EQ term         {}
+    | exp BIG term             {}
+    | exp BIG_EQ term          {}
+    | exp EQ term              {}
     ;
 
-alias : ID                    {char *str = (char *) malloc(10);
-                               sprintf(str, "%s", $1);
-                               $$ = mknode( 0, 0, ID, str);}
+types : type              {}
+      | type array        {}
       ;
 
-term : alias                  {$$ = $1;}
+type : INTEGER    {}
+     | CHAR       {}
+     | STRING     {}
+     ;
+
+array : LEFT_BRACKET RIGHT_BRACKET        {}
+      | LEFT_BRACKET term RIGHT_BRACKET   {}
+
+term : ID                     {char *str = (char *) malloc(10);
+                               sprintf(str, "%s", $1);
+                               $$ = mknode( 0, 0, ID, str);}
      | NUMBER                 {char *str = (char *) malloc(10);
                                sprintf(str, "%i", $1);
                                $$ = mknode( 0, 0, NUMBER, str);}

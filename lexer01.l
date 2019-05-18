@@ -1,15 +1,16 @@
 %{
    #include "y.tab.h"
    int yycolno = 0;
+   extern int yylineno;
 %}
 
 %%
 
-^[ |\t]*[\n\r]            {/* Ignore any blank line*/ yycolno=0;}
+^[ |\t]*[\n\r]            {/* Ignore any blank line */ yycolno=0;yylineno++;}
 
 ","                       {yycolno++;return(COMMA);}
 "."                       {yycolno++;return(DOT);}
-[\n\r;]                   {yycolno++;return(END);}
+[\n\r;]                   {yycolno=0;return(END);}
 "+"                       {yycolno++;return(PLUS);}
 "-"                       {yycolno++;return(MINUS);}
 "*"                       {yycolno++;return(TIMES);}
@@ -21,43 +22,46 @@
 "]"                       {yycolno++;return(RIGHT_BRACKET);}
 "{"                       {yycolno++;return(LEFT_KEY);}
 "}"                       {yycolno++;return(RIGHT_KEY);}
-"<="                      {yycolno++;return(LESS_EQ);}
-">="                      {yycolno++;return(BIG_EQ);}
+"<="                      {yycolno+=2;return(LESS_EQ);}
+">="                      {yycolno+=2;return(BIG_EQ);}
 "<"                       {yycolno++;return(LESS);}
 ">"                       {yycolno++;return(BIG);}
 "="                       {yycolno++;return(ASSIGN);}
-"=="                      {yycolno++;return(EQ);}
-"procedure"               {yycolno++;return(PROCEDURE);}
-"end_procedure"           {yycolno++;return(END_PROCEDURE);}
-"if"                      {yycolno++;return(IF);}
-"then"                    {yycolno++;return(THEN);}
-"end_if"                  {yycolno++;return(END_IF);}
-"else"                    {yycolno++;return(ELSE);}
-"do"                      {yycolno++;return(DO);}
-"while"                   {yycolno++;return(WHILE);}
-"end_while"               {yycolno++;return(END_WHILE);}
-"for"                     {yycolno++;return(FOR);}
-"end_for"                 {yycolno++;return(END_FOR);}
-"int"                     {yycolno++;return(INTEGER);}
-"char"                    {yycolno++;return(CHAR);}
-"str"                     {yycolno++;return(STRING);}
+"=="                      {yycolno+=2;return(EQ);}
+"procedure"               {yycolno+=9;return(PROCEDURE);}
+"end_procedure"           {yycolno+=11;return(END_PROCEDURE);}
+"function"                {yycolno+=8;return(FUNCTION);}
+"end_function"            {yycolno+=10;return(END_FUNCTION);}
+"if"                      {yycolno+=2;return(IF);}
+"then"                    {yycolno+=4;return(THEN);}
+"end_if"                  {yycolno+=6;return(END_IF);}
+"else"                    {yycolno+=4;return(ELSE);}
+"do"                      {yycolno+=2;return(DO);}
+"while"                   {yycolno+=5;return(WHILE);}
+"end_while"               {yycolno+=9;return(END_WHILE);}
+"for"                     {yycolno+=3;return(FOR);}
+"end_for"                 {yycolno+=7;return(END_FOR);}
+"int"                     {yycolno+=3;return(INTEGER);}
+"char"                    {yycolno+=4;return(CHAR);}
+"str"                     {yycolno+3;return(STRING);}
 "#.*"                     {yylval.sValue = strdup(yytext);
-                           yycolno++;return(BEGIN_COMMENT);}
+                           return(BEGIN_COMMENT);}
 
 "\".*\""                  {yylval.sValue = strdup(yytext);
-                           yycolno++;return(STRING_VAL);}
+                           yycolno+=strlen(yylval.sValue);return(STRING_VAL);}
 
 "\'.\'"                   {yylval.cValue = yytext[1];
                            yycolno++;return(CHAR_VAL);}
 
 [0-9]+                    {yylval.iValue = atoi(yytext);
-                           yycolno++;return(NUMBER);}
+                           yycolno+=strlen(yytext);return(NUMBER);}
 
 [a-zA-Z][a-zA-Z0-9_]*     {yylval.sValue = strdup(yytext);
-                           yycolno++;return(ID);}
+                           yycolno+=strlen(yytext);return(ID);}
 
-[\t]                      {yycolno++;return(INDENT);}
-[ ]{2,4}                  {yycolno++;return(INDENT);}
+^[\t]                     {yycolno++;return(INDENT);}
+^[ ]{2}                   {yycolno+=2;return(INDENT);}
+^[ ]{4}                   {yycolno+=4;return(INDENT);}
 
 [ ]                       {/* Ignore white spaces */yycolno++;}
 
