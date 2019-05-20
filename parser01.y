@@ -66,56 +66,55 @@ void generate(node *tree);
 %token STRING
 
  /* %start prog */
-%start lines
+%start stms
 
  /* %left INTEGER CHAR STRING */
-%type <npValue> stms stm exp term block type ids params param array // declare
+%type <npValue> stms stm exp term block type ids array params param // declare
 
 %%
 
-lines :
+/* lines :
       | lines line
 
 line  : coment  {}
       | stms    {}
       ;
 
-coment : BEGIN_COMMENT END      {}
+coment : BEGIN_COMMENT END      {} */
 
 stms : stm END                {}
-     | stms END stm END       {}
+     | stms stm END           {}
      ;
 
-stm : declare                                                               {}
-    | block                                                                 {}
-    | structs                                                               {}
+stm : declare         {}
+    | block           {}
+    | structs         {}
     ;
 
 structs : PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS END block END_PROCEDURE            {}
-        | PROCEDURE ID LEFT_PARENTHESIS RIGHT_PARENTHESIS END block END_PROCEDURE                   {}
-        | FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS END block END_FUNCTION              {}
-        | FUNCTION ID LEFT_PARENTHESIS RIGHT_PARENTHESIS END block END_FUNCTION                     {}
-        | WHILE stm DO END stms END_WHILE                                       {}
-        | IF stm THEN END block END_IF                                          {}
-        | IF stm THEN END block ELSE END block END_IF                           {}
+        | types FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS END block END_FUNCTION              {}
+        | WHILE stm DO END stms END_WHILE                        {}
+        | IF stm THEN END block END_IF                           {}
+        | IF stm THEN END block ELSE END block END_IF            {}
         ;
 
 block : INDENT stms                                           {}
-      | LEFT_PARENTHESIS stms RIGHT_PARENTHESIS               {}
       | LEFT_BRACKET stms RIGHT_BRACKET                       {}
       | LEFT_KEY stms RIGHT_KEY                               {}
       ;
 
-params : types param                 {}
-       | params COMMA types param    {}
+params :                                                      {}
+       | param                                          {}
+       | params COMMA param                             {}
+       /*| LEFT_PARENTHESIS params RIGHT_PARENTHESIS            {}*/
        ;
 
-param : ids                    {}
-      | ids ASSIGN exps        {}
+param : types ids                          {}
+      /*| types ids assign                   {}*/
       ;
 
-/* assign : ids ASSIGN exps        {}
-       ;*/
+assign : ASSIGN exps        {}
+       ;
 
 ids : ID                  {}
     | ids COMMA ID        {}
@@ -123,7 +122,8 @@ ids : ID                  {}
     | ids COMMA ID array  {} */
     ;
 
-declare : types ids       {}
+declare : types ids         {}
+        | types ids assign  {}
         ;
 
 exps : exp              {}

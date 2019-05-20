@@ -10,7 +10,7 @@
 
 ","                       {yycolno++;return(COMMA);}
 "."                       {yycolno++;return(DOT);}
-[\n\r;]                   {yycolno=0;return(END);}
+[\r\n;]                   {yycolno=0;return(END);}
 "+"                       {yycolno++;return(PLUS);}
 "-"                       {yycolno++;return(MINUS);}
 "*"                       {yycolno++;return(TIMES);}
@@ -44,13 +44,12 @@
 "int"                     {yycolno+=3;return(INTEGER);}
 "char"                    {yycolno+=4;return(CHAR);}
 "str"                     {yycolno+3;return(STRING);}
-"#.*"                     {yylval.sValue = strdup(yytext);
-                           return(BEGIN_COMMENT);}
+"#".*[\r\n]                     {}
 
-"\".*\""                  {yylval.sValue = strdup(yytext);
+\".*\"                  {yylval.sValue = strdup(yytext);
                            yycolno+=strlen(yylval.sValue);return(STRING_VAL);}
 
-"\'.\'"                   {yylval.cValue = yytext[1];
+\'.\'                   {yylval.cValue = yytext[1];
                            yycolno++;return(CHAR_VAL);}
 
 [0-9]+                    {yylval.iValue = atoi(yytext);
