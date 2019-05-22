@@ -29,6 +29,7 @@ void generate(node *tree);
 
 %union {
   int    iValue;  /* integer value */
+  /*float  fValue;  /* float value */
   char   cValue;  /* char value */
   char * sValue;  /* string value */
   struct node * npValue;  /* node pointer value */
@@ -36,19 +37,22 @@ void generate(node *tree);
 
 %token <sValue> ID
 %token <iValue> NUMBER
+/*%token <fValue> FLOAT_NUMBER*/
 %token <sValue> STRING_VAL
 %token <cValue> CHAR_VAL
 
 
  /* DELIMITERS */
-%token BEGIN_COMMENT
+%token BEGIN_PROGRAM END_PROGRAM
+%token COMMENT
 %token LEFT_PARENTHESIS  RIGHT_PARENTHESIS
 %token LEFT_BRACKET RIGHT_BRACKET
 %token LEFT_KEY RIGHT_KEY
 %token COMMA
 %token DOT
-%token END
+%token ENDL
 %token INDENT
+%token EXIT
  /* %token SEMICOLON */
 
  /*CONTROL STRUCTURES*/
@@ -64,12 +68,13 @@ void generate(node *tree);
 %token INTEGER
 %token CHAR
 %token STRING
+%token FLOAT
 
  /* %start prog */
 %start stms
 
  /* %left INTEGER CHAR STRING */
-%type <npValue> stms stm exp term block type ids array params param // declare
+%type <npValue> stms stm exp term block type ids array params param declare // comment
 
 %%
 
@@ -80,28 +85,65 @@ line  : coment  {}
       | stms    {}
       ;
 
-coment : BEGIN_COMMENT END      {} */
+coment : BEGIN_COMMENT ENDL      {} */
 
-stms : stm END                {}
-     | stms stm END           {}
+/* prog : BEGIN_PROGRAM ENDL stms END_PROGRAM ENDL    {} */
+
+stms : stm ENDL           {}
+     | stms stm ENDL      {}
      ;
 
-stm : declare         {}
-    | block           {}
-    | structs         {}
+stm : declare        {}
+    | block          {}
+    | structs        {}
+    | proc           {}
+    | assign         {}
+    | EXIT NUMBER    {}
+    /* | comment           {} */
     ;
 
-structs : PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS END block END_PROCEDURE            {}
-        | types FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS END block END_FUNCTION              {}
-        | WHILE stm DO END stms END_WHILE                        {}
-        | IF stm THEN END block END_IF                           {}
-        | IF stm THEN END block ELSE END block END_IF            {}
+/*comment : COMMENT     {}
+        | comment ENDL {}
+        ;*/
+
+structs : PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL block END_PROCEDURE                   {}
+        | types FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL block END_FUNCTION               {}
+        | WHILE exps DO ENDL block END_WHILE                                                                {}
+        | IF exps THEN ENDL block END_IF                                                                    {}
+        | IF exps THEN ENDL block else END_IF                                                                {}
         ;
 
+else : ELSE ENDL block                                      {}
+     | ELSE IF exps THEN block else                         {}
+     ;
+
+cast : LEFT_PARENTHESIS types RIGHT_PARENTHESIS             {}
+     | LEFT_PARENTHESIS ID RIGHT_PARENTHESIS                {}
+     ;
+
+proc : ID LEFT_PARENTHESIS RIGHT_PARENTHESIS                  {}
+     | ID LEFT_PARENTHESIS exps RIGHT_PARENTHESIS             {}
+     ;
+
 block : INDENT stms                                           {}
-      | LEFT_BRACKET stms RIGHT_BRACKET                       {}
       | LEFT_KEY stms RIGHT_KEY                               {}
       ;
+
+assign : ids ASSIGN exps             {}
+       | ids ASSIGN cast exps        {}
+       | ID PLUS PLUS                {}
+       ;
+
+ids : ID                  {}
+    | ids COMMA ID        {}
+    /* | ID array            {}
+    | ids COMMA ID array  {} */
+    ;
+
+declare : types ids         {}
+        | types assign  {}
+        ;
+
 
 params :                                                      {}
        | param                                          {}
@@ -112,19 +154,6 @@ params :                                                      {}
 param : types ids                          {}
       /*| types ids assign                   {}*/
       ;
-
-assign : ASSIGN exps        {}
-       ;
-
-ids : ID                  {}
-    | ids COMMA ID        {}
-    /* | ID array            {}
-    | ids COMMA ID array  {} */
-    ;
-
-declare : types ids         {}
-        | types ids assign  {}
-        ;
 
 exps : exp              {}
      | exps COMMA exp   {}
@@ -141,6 +170,7 @@ exp : term
     | exp BIG term             {}
     | exp BIG_EQ term          {}
     | exp EQ term              {}
+    | proc                     {}
     ;
 
 types : type              {}
@@ -150,7 +180,13 @@ types : type              {}
 type : INTEGER    {}
      | CHAR       {}
      | STRING     {}
+     | FLOAT      {}
      ;
+
+numeral : NUMBER  {}
+        | NUMBER DOT        {}
+        | NUMBER DOT NUMBER {}
+        ;
 
 array : LEFT_BRACKET RIGHT_BRACKET        {}
       | LEFT_BRACKET term RIGHT_BRACKET   {}
@@ -158,9 +194,13 @@ array : LEFT_BRACKET RIGHT_BRACKET        {}
 term : ID                     {char *str = (char *) malloc(10);
                                sprintf(str, "%s", $1);
                                $$ = mknode( 0, 0, ID, str);}
-     | NUMBER                 {char *str = (char *) malloc(10);
+     /*| NUMBER                 {char *str = (char *) malloc(10);
                                sprintf(str, "%i", $1);
-                               $$ = mknode( 0, 0, NUMBER, str);}
+                               $$ = mknode( 0, 0, NUMBER, str);}*/
+     | numeral                {}
+     /*| FLOAT_NUMBER           {char *str = (char *) malloc(10);
+                               sprintf(str, "%f", $1);
+                               $$ = mknode( 0, 0, FLOAT_NUMBER, str);}*/
      | CHAR_VAL               {char *str = (char *) malloc(2);
                                sprintf(str, "%c", $1);
                                $$ = mknode( 0, 0, CHAR_VAL, str);}

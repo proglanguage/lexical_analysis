@@ -1,26 +1,24 @@
-begin_program
-  int first, second, third, fourth = 0
-  int input = 0
+int first, second, third, fourth = 0
+int input = 0
 
-  while input >= 0 do
-    # Get value from standard input
-    input = (int) gets
+while input >= 0 do
+  # Get value from standard input
+  input = (int) gets
 
-    if input < 26 then
-      first++
-    elsif input < 51 then
-      second++
-    elsif input < 76 then
-      third++
-    elsif input < 101 then
-      fourth++
-    end_if
-  end_while
+  if input < 26 then
+    first++
+  else if input < 51 then
+    second++
+  else if input < 76 then
+    third++
+  else if input < 101 then
+    fourth++
+  end_if
+end_while
 
-  puts("0-25: %d", first)
-  puts("26-50: %d", second)
-  puts("51-75: %d", third)
-  puts("76-100: %d", fourth)
+puts("0-25: %d", first)
+puts("26-50: %d", second)
+puts("51-75: %d", third)
+puts("76-100: %d", fourth)
 
-  exit 0
-end_program
+exit 0
