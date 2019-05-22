@@ -1,0 +1,11 @@
+begin_program
+  float x = 1.2345
+  float y = 2f
+  int c = 3
+
+  # Prints to standard output
+  puts("result: %d", x ^ 2 - y + c)
+
+  # We need to return an integer for process return code
+  exit 0
+end_program

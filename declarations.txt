@@ -1,8 +1,0 @@
-int a
-char c, b
-str f = "regra"
-str f, g = "regra", "doida"
-
-procedure kakakaka(int a)
-    a + 1
-end_procedure
