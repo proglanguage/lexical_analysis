@@ -47,6 +47,8 @@
 "for"                     {yycolno+=3;printf("FOR ");return(FOR);}
 "end_for"                 {yycolno+=7;printf("END_FOR ");return(END_FOR);}
 "break"                   {yycolno+=5;printf("BREAK ");return(BREAK);}
+"loop"                    {yycolno+=4;printf("LOOP ");return(LOOP);}
+"end_loop"                {yycolno+=8;printf("END_LOOP ");return(END_LOOP);}
 "exit"                    {yycolno+=4;printf("EXIT ");return(EXIT);}
 
 

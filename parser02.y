@@ -60,7 +60,7 @@ void generate(node *tree);
 
  /*CONTROL STRUCTURES*/
 %token PROCEDURE END_PROCEDURE FUNCTION END_FUNCTION IF THEN ELSE END_IF
-%token DO WHILE END_WHILE FOR END_FOR
+%token DO WHILE END_WHILE FOR END_FOR LOOP END_LOOP
 
  /* OPERATORS */
 %token ASSIGN
@@ -99,6 +99,7 @@ stmt :                {printf("reduce to stmt vazio\n");}
 structs : PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_PROCEDURE                   {}
         | types FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_FUNCTION               {}
         | WHILE exps DO ENDL stmts END_WHILE                                                                {}
+        | LOOP ENDL stmts END_LOOP                                                                          {}
         | if                                                                                                {printf("reduce to if\n");}
         ;
 
@@ -122,13 +123,13 @@ cast : LEFT_PARENTHESIS types RIGHT_PARENTHESIS             {}
 assign : ids ASSIGN exps             {}
        | ids ASSIGN cast exps        {}
        | ID PLUS PLUS                {}
-       | ID MINUS MINUS                {}
+       | ID MINUS MINUS              {}
        ;
 
-ids : ID                  {}
-    | ids COMMA ID        {}
-    | ID array_op            {}
-    | ids COMMA ID array_op  {}
+ids : ID                      {}
+    | ids COMMA ID            {}
+    | ID array_ops            {}
+    | ids COMMA ID array_ops  {}
     ;
 
 declare : types ids     {}
@@ -163,6 +164,7 @@ exp : term
     | exp AND term              {}
     | exp OR term              {}
     | LEFT_PARENTHESIS exp RIGHT_PARENTHESIS {}
+    | exp DOT proc              {}
     | proc                     {}
     ;
 
@@ -171,7 +173,7 @@ proc : ID LEFT_PARENTHESIS RIGHT_PARENTHESIS                  {}
      ;
 
 types : type              {}
-      | type array_op        {}
+      | type array_ops        {}
       ;
 
 type : INTEGER    {}
@@ -190,12 +192,16 @@ bool : TRUE  {}
      | FALSE {}
      ;
 
+array_ops : array_op            {}
+          | array_ops array_op  {}
+          ;
+
 array_op : LEFT_BRACKET RIGHT_BRACKET        {}
-      | LEFT_BRACKET exp RIGHT_BRACKET   {}
-      ;
+         | LEFT_BRACKET exp RIGHT_BRACKET   {}
+         ;
 
 term : ID                     {}
-     | ID array_op               {}
+     | ID array_ops           {}
      | numeral                {}
      | CHAR_VAL               {}
      | STRING_VAL             {}

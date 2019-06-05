@@ -1,0 +1,14 @@
+int[][] function read_matrix()
+  int[][] matrix
+
+  loop
+    input = gets
+    if input == "" then
+      break
+    end_if
+
+    matrix.append((int[]) gets.split(' '))
+  end_loop
+
+  return matrix
+end_function
