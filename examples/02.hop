@@ -1,11 +1,13 @@
 int first, second, third, fourth = 0
 int input = 0
 
-while input >= 0 do
+while true do
   # Get value from standard input
   input = (int) gets
 
-  if input < 26 then
+  if input < 0 then
+    break
+  else if input < 26 then
     first++
   else if input < 51 then
     second++

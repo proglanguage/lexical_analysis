@@ -40,7 +40,9 @@ void generate(node *tree);
 /*%token <fValue> FLOAT_NUMBER*/
 %token <sValue> STRING_VAL
 %token <cValue> CHAR_VAL
+%token <iValue> BOOL_VAL
 
+%token TRUE FALSE
 
  /* DELIMITERS */
 %token BEGIN_PROGRAM END_PROGRAM
@@ -53,6 +55,7 @@ void generate(node *tree);
 %token ENDL
 %token INDENT
 %token EXIT
+%token BREAK
  /* %token SEMICOLON */
 
  /*CONTROL STRUCTURES*/
@@ -63,18 +66,20 @@ void generate(node *tree);
 %token ASSIGN
 %token PLUS MINUS TIMES DIVIDE  POWER
 %token LESS_EQ BIG_EQ LESS BIG EQ
+%token AND OR
 
  /* TYPES */
 %token INTEGER
 %token CHAR
 %token STRING
 %token FLOAT
+%token BOOLEAN
 
  /* %start prog */
 %start stmts
 
  /* %left INTEGER CHAR STRING */
- /*%type <npValue> stms stm exp term block type ids array params param declare // comment */
+ /*%type <npValue> stms stm exp term block type ids array_op params param declare // comment */
 
 %%
 
@@ -84,50 +89,46 @@ stmts : stmt                 {printf("reduce to statement rule 1\n");}
 
 stmt :                {printf("reduce to stmt vazio\n");}
      | declare        {printf("reduce to declare\n");}
-     | block          {printf("reduce to block\n");}
      | structs        {printf("reduce to structs\n");}
      | proc           {printf("reduce to proc\n");}
      | assign         {printf("reduce to assign\n");}
+     | BREAK          {}
      | EXIT NUMBER    {}
      ;
 
-structs : PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL block END_PROCEDURE                   {}
-        | types FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL block END_FUNCTION               {}
-        | WHILE exps DO ENDL block END_WHILE                                                                {}
+structs : PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_PROCEDURE                   {}
+        | types FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_FUNCTION               {}
+        | WHILE exps DO ENDL stmts END_WHILE                                                                {}
         | if                                                                                                {printf("reduce to if\n");}
         ;
 
-if : IF exps THEN ENDL block else END_IF                                                               {}
+if : IF exps THEN ENDL stmts elseifs END_IF       {}
    ;
 
+elseifs : else            {printf("reduce to else if\n");}
+        | elseif elseifs  {}
+        ;
+
+elseif : ELSE IF exps THEN ENDL stmts  {}
+       ;
+
 else :
-     | ELSE ENDL block                                      {printf("reduce to else\n");}
-     | ELSE if                                              {printf("reduce to else if\n");}
-     /*| INDENT ELSE ENDL block                                      {}
-     | INDENT ELSE if                                              {}*/
+     | ELSE ENDL stmts                                      {printf("reduce to else\n");}
      ;
 
 cast : LEFT_PARENTHESIS types RIGHT_PARENTHESIS             {}
-     | LEFT_PARENTHESIS ID RIGHT_PARENTHESIS                {}
      ;
-
-/*indents : INDENT {}
-        | indents INDENT {}
-        ;*/
-
-block : INDENT stmts                                           {}
-      | LEFT_KEY stmts RIGHT_KEY                               {}
-      ;
 
 assign : ids ASSIGN exps             {}
        | ids ASSIGN cast exps        {}
        | ID PLUS PLUS                {}
+       | ID MINUS MINUS                {}
        ;
 
 ids : ID                  {}
     | ids COMMA ID        {}
-    | ID array            {}
-    | ids COMMA ID array  {}
+    | ID array_op            {}
+    | ids COMMA ID array_op  {}
     ;
 
 declare : types ids     {}
@@ -140,7 +141,7 @@ params :                                                {}
        | params COMMA param                             {}
        ;
 
-param : types ids                          {}
+param : types ID                          {}
       /*| types ids assign                   {}*/
       ;
 
@@ -159,6 +160,9 @@ exp : term
     | exp BIG term             {}
     | exp BIG_EQ term          {}
     | exp EQ term              {}
+    | exp AND term              {}
+    | exp OR term              {}
+    | LEFT_PARENTHESIS exp RIGHT_PARENTHESIS {}
     | proc                     {}
     ;
 
@@ -167,13 +171,14 @@ proc : ID LEFT_PARENTHESIS RIGHT_PARENTHESIS                  {}
      ;
 
 types : type              {}
-      | type array        {}
+      | type array_op        {}
       ;
 
 type : INTEGER    {}
      | CHAR       {}
      | STRING     {}
      | FLOAT      {}
+     | BOOLEAN    {}
      ;
 
 numeral : NUMBER  {}
@@ -181,13 +186,20 @@ numeral : NUMBER  {}
         | NUMBER DOT NUMBER {}
         ;
 
-array : LEFT_BRACKET RIGHT_BRACKET        {}
-      | LEFT_BRACKET term RIGHT_BRACKET   {}
+bool : TRUE  {}
+     | FALSE {}
+     ;
+
+array_op : LEFT_BRACKET RIGHT_BRACKET        {}
+      | LEFT_BRACKET exp RIGHT_BRACKET   {}
+      ;
 
 term : ID                     {}
+     | ID array_op               {}
      | numeral                {}
      | CHAR_VAL               {}
      | STRING_VAL             {}
+     | bool                   {}
      ;
 
 %%

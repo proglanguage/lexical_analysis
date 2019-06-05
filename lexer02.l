@@ -27,6 +27,10 @@
 ">"                       {yycolno++;printf("BIG ");return(BIG);}
 "="                       {yycolno++;printf("ASSIGN ");return(ASSIGN);}
 "=="                      {yycolno+=2;printf("EQ ");return(EQ);}
+"and"                     {yycolno+=3;printf("AND ");return(AND);}
+"or"                      {yycolno+=2;printf("OR ");return(OR);}
+"true"                    {yycolno+=4;printf("TRUE ");return(TRUE);}
+"false"                   {yycolno+=5;printf("FALSE ");return(FALSE);}
 "begin_program"           {yycolno+=13;printf("BEGIN_PROGRAM ");return(BEGIN_PROGRAM);}
 "end_program"             {yycolno+=13;printf("END_PROGRAM ");return(END_PROGRAM);}
 "procedure"               {yycolno+=9;printf("PROCEDURE ");return(PROCEDURE);}
@@ -42,6 +46,7 @@
 "end_while"               {yycolno+=9;printf("END_WHILE ");return(END_WHILE);}
 "for"                     {yycolno+=3;printf("FOR ");return(FOR);}
 "end_for"                 {yycolno+=7;printf("END_FOR ");return(END_FOR);}
+"break"                   {yycolno+=5;printf("BREAK ");return(BREAK);}
 "exit"                    {yycolno+=4;printf("EXIT ");return(EXIT);}
 
 
@@ -49,6 +54,7 @@
 "float"                   {yycolno+=5;printf("FLOAT ");return(FLOAT);}
 "char"                    {yycolno+=4;printf("CHAR ");return(CHAR);}
 "str"                     {yycolno+3;printf("STRING ");return(STRING);}
+"bool"                    {yycolno+4;printf("BOOLEAN ");return(BOOLEAN);}
 
 
 "#".*[\r\n]               {printf("COMMENT\n");}
@@ -73,8 +79,7 @@
 [a-zA-Z][a-zA-Z0-9_]*     {yylval.sValue = strdup(yytext);
                            yycolno+=strlen(yytext);printf("ID ");return(ID);}
 
-^[\t]                     {yycolno++;printf("INDENTT ");return(INDENT);}
-^[ ]{2}                   {yycolno+=2;printf("INDENT2 ");return(INDENT);}
+^[\t]                     {yycolno++;}
 
 [ ]                       {/* Ignore white spaces */yycolno++;}
 
