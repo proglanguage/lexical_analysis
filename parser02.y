@@ -169,7 +169,8 @@ exp: term                                        {}
    | exp DOT term                                {}
    | exp COMMA term                              {}
    | exp LEFT_PARENTHESIS RIGHT_PARENTHESIS      {}
-   | exp LEFT_PARENTHESIS exp RIGHT_PARENTHESIS      {} 
+   | exp LEFT_PARENTHESIS exp RIGHT_PARENTHESIS  {}
+   | LEFT_PARENTHESIS exp RIGHT_PARENTHESIS      {} 
   //  | proc                                        {}
    ;
 
@@ -201,7 +202,7 @@ array_ops: array_op            {}
          ;
 
 array_op: LEFT_BRACKET RIGHT_BRACKET        {}
-        | LEFT_BRACKET exp RIGHT_BRACKET   {}
+        | LEFT_BRACKET exp RIGHT_BRACKET    {}
         ;
 
 term: ID                     {}
