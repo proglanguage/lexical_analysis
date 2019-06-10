@@ -29,7 +29,7 @@ void generate(node *tree);
 
 %union {
   int    iValue;  /* integer value */
-  /*float  fValue;  /* float value */
+  float  fValue;  /* float value */
   char   cValue;  /* char value */
   char * sValue;  /* string value */
   struct node * npValue;  /* node pointer value */
@@ -37,7 +37,7 @@ void generate(node *tree);
 
 %token <sValue> ID
 %token <iValue> NUMBER
-/*%token <fValue> FLOAT_NUMBER*/
+%token <fValue> FLOAT_NUMBER
 %token <sValue> STRING_VAL
 %token <cValue> CHAR_VAL
 %token <iValue> BOOL_VAL
@@ -56,6 +56,7 @@ void generate(node *tree);
 %token INDENT
 %token EXIT
 %token BREAK
+%token RETURN
  /* %token SEMICOLON */
 
  /*CONTROL STRUCTURES*/
@@ -83,130 +84,134 @@ void generate(node *tree);
 
 %%
 
-stmts : stmt                 {printf("reduce to statement rule 1\n");}
-      | stmts ENDL stmt      {printf("reduce to statement rule 2\n");}
-      ;
-
-stmt :                {printf("reduce to stmt vazio\n");}
-     | declare        {printf("reduce to declare\n");}
-     | structs        {printf("reduce to structs\n");}
-     | proc           {printf("reduce to proc\n");}
-     | assign         {printf("reduce to assign\n");}
-     | BREAK          {}
-     | EXIT NUMBER    {}
+stmts: stmt                 {printf("reduce to statement rule 1\n");}
+     | stmts ENDL stmt      {printf("reduce to statement rule 2\n");}
      ;
 
-structs : PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_PROCEDURE                   {}
-        | types FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_FUNCTION               {}
-        | WHILE exps DO ENDL stmts END_WHILE                                                                {}
-        | LOOP ENDL stmts END_LOOP                                                                          {}
-        | if                                                                                                {printf("reduce to if\n");}
-        ;
+stmt:                {printf("reduce to stmt vazio\n");}
+    | declare        {printf("reduce to declare\n");}
+    | structs        {printf("reduce to structs\n");}
+    | assign         {printf("reduce to assign\n");}
+    | exp            {}
+    | BREAK          {}
+    | EXIT NUMBER    {}
+    | RETURN exps    {}
+    ;
 
-if : IF exps THEN ENDL stmts elseifs END_IF       {}
+structs: PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_PROCEDURE                   {}
+       | types FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_FUNCTION               {}
+       | WHILE exps DO ENDL stmts END_WHILE                                                                {}
+       | LOOP ENDL stmts END_LOOP                                                                          {}
+       | if                                                                                                {printf("reduce to if\n");}
+       ;
+
+if: IF exps THEN ENDL stmts elseifs END_IF       {}
+  ;
+
+elseifs: else            {printf("reduce to else if\n");}
+       | elseif elseifs  {}
+       ;
+
+elseif: ELSE IF exps THEN ENDL stmts  {}
+      ;
+
+else:
+    | ELSE ENDL stmts                                      {printf("reduce to else\n");}
+    ;
+
+cast: LEFT_PARENTHESIS types RIGHT_PARENTHESIS             {}
+    ;
+
+assign: ids ASSIGN exps             {}
+      // | ids ASSIGN cast exps        {}
+      | ID PLUS PLUS                {}
+      | ID MINUS MINUS              {}
+      ;
+
+ids: ID                      {}
+   | ids COMMA ID            {}
+   | ID array_ops            {}
+   | ids COMMA ID array_ops  {}
    ;
 
-elseifs : else            {printf("reduce to else if\n");}
-        | elseif elseifs  {}
-        ;
-
-elseif : ELSE IF exps THEN ENDL stmts  {}
+declare: types ids     {}
+       | types assign  {}
        ;
 
-else :
-     | ELSE ENDL stmts                                      {printf("reduce to else\n");}
-     ;
 
-cast : LEFT_PARENTHESIS types RIGHT_PARENTHESIS             {}
-     ;
-
-assign : ids ASSIGN exps             {}
-       | ids ASSIGN cast exps        {}
-       | ID PLUS PLUS                {}
-       | ID MINUS MINUS              {}
-       ;
-
-ids : ID                      {}
-    | ids COMMA ID            {}
-    | ID array_ops            {}
-    | ids COMMA ID array_ops  {}
-    ;
-
-declare : types ids     {}
-        | types assign  {}
-        ;
-
-
-params :                                                {}
-       | param                                          {}
-       | params COMMA param                             {}
-       ;
-
-param : types ID                          {}
-      /*| types ids assign                   {}*/
+params:                                                {}
+      | param                                          {}
+      | params COMMA param                             {}
       ;
 
-exps : exp              {}
-     | exps COMMA exp   {}
+param: types ID                          {}
      ;
 
-exp : term
-    | exp PLUS term            {}
-    | exp TIMES term           {}
-    | exp DIVIDE term          {}
-    | exp MINUS term           {}
-    | exp POWER term           {}
-    | exp LESS term            {}
-    | exp LESS_EQ term         {}
-    | exp BIG term             {}
-    | exp BIG_EQ term          {}
-    | exp EQ term              {}
-    | exp AND term              {}
-    | exp OR term              {}
-    | LEFT_PARENTHESIS exp RIGHT_PARENTHESIS {}
-    | exp DOT proc              {}
-    | proc                     {}
+exps: exp              {}
+    | exps exp         {}
+    // | exps LEFT_PARENTHESIS RIGHT_PARENTHESIS      {}
+    // | exps LEFT_PARENTHESIS exp RIGHT_PARENTHESIS      {}
     ;
 
-proc : ID LEFT_PARENTHESIS RIGHT_PARENTHESIS                  {}
-     | ID LEFT_PARENTHESIS exps RIGHT_PARENTHESIS             {}
+exp: term                                        {}
+   | exp PLUS term                               {}
+   | exp TIMES term                              {}
+   | exp DIVIDE term                             {}
+   | exp MINUS term                              {}
+   | exp POWER term                              {}
+   | exp LESS term                               {}
+   | exp LESS_EQ term                            {}
+   | exp BIG term                                {}
+   | exp BIG_EQ term                             {}
+   | exp EQ term                                 {}
+   | exp AND term                                {}
+   | exp OR term                                 {}
+   | exp DOT term                                {}
+   | exp COMMA term                              {}
+   | exp LEFT_PARENTHESIS RIGHT_PARENTHESIS      {}
+   | exp LEFT_PARENTHESIS exp RIGHT_PARENTHESIS      {} 
+  //  | proc                                        {}
+   ;
+
+/* proc: term LEFT_PARENTHESIS RIGHT_PARENTHESIS                  {}
+    | term LEFT_PARENTHESIS exp RIGHT_PARENTHESIS              {}
+    ; */
+
+types: type              {}
+     | type array_ops        {}
      ;
 
-types : type              {}
-      | type array_ops        {}
-      ;
+type: INTEGER    {}
+    | CHAR       {}
+    | STRING     {}
+    | FLOAT      {}
+    | BOOLEAN    {}
+    ;
 
-type : INTEGER    {}
-     | CHAR       {}
-     | STRING     {}
-     | FLOAT      {}
-     | BOOLEAN    {}
-     ;
+numeral: NUMBER             {}
+       | FLOAT_NUMBER       {}
+       ;
 
-numeral : NUMBER  {}
-        | NUMBER DOT        {}
-        | NUMBER DOT NUMBER {}
-        ;
+bool: TRUE  {}
+    | FALSE {}
+    ;
 
-bool : TRUE  {}
-     | FALSE {}
-     ;
-
-array_ops : array_op            {}
-          | array_ops array_op  {}
-          ;
-
-array_op : LEFT_BRACKET RIGHT_BRACKET        {}
-         | LEFT_BRACKET exp RIGHT_BRACKET   {}
+array_ops: array_op            {}
+         | array_ops array_op  {}
          ;
 
-term : ID                     {}
-     | ID array_ops           {}
-     | numeral                {}
-     | CHAR_VAL               {}
-     | STRING_VAL             {}
-     | bool                   {}
-     ;
+array_op: LEFT_BRACKET RIGHT_BRACKET        {}
+        | LEFT_BRACKET exp RIGHT_BRACKET   {}
+        ;
+
+term: ID                     {}
+    | ID array_ops           {}
+    | numeral                {}
+    | CHAR_VAL               {}
+    | STRING_VAL             {}
+    | bool                   {}
+    | cast                   {}
+    ;
 
 %%
 

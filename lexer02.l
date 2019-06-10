@@ -50,7 +50,7 @@
 "loop"                    {yycolno+=4;printf("LOOP ");return(LOOP);}
 "end_loop"                {yycolno+=8;printf("END_LOOP ");return(END_LOOP);}
 "exit"                    {yycolno+=4;printf("EXIT ");return(EXIT);}
-
+"return"                    {yycolno+=4;printf("RETURN ");return(RETURN);}
 
 "int"                     {yycolno+=3;printf("INTEGER ");return(INTEGER);}
 "float"                   {yycolno+=5;printf("FLOAT ");return(FLOAT);}
@@ -63,13 +63,17 @@
 "#".*                     {printf("COMMENT ");}
 
 \".*\"                      {yylval.sValue = strdup(yytext);
-                             yycolno+=strlen(yylval.sValue);printf("STRING_VAL ");return(STRING_VAL);}
+                             yycolno+=strlen(yylval.sValue)+2;printf("STRING_VAL ");return(STRING_VAL);}
 
 \'.\'                       {yylval.cValue = yytext[1];
-                             yycolno++;printf("CHAR_VAL ");return(CHAR_VAL);}
+                             yycolno+=3;printf("CHAR_VAL ");return(CHAR_VAL);}
 
- /*[0-9a-fA-F]+\.[0-9a-fA-F]*  {yylval.fValue = atof(yytext);
-                             yycolno+=strlen(yytext);printf("FLOAT_NUMBER ");return(FLOAT_NUMBER);}*/
+[0-9]*\.[0-9]*              {yylval.fValue = atof(yytext);
+                             yycolno+=strlen(yytext);printf("FLOAT_NUMBER ");return(FLOAT_NUMBER);}
+
+[0-9]+f                     {yylval.fValue = atof(yytext);
+                             yycolno+=strlen(yytext);printf("FLOAT_NUMBER ");return(FLOAT_NUMBER);}
+
 
 [0-9]+                      {yylval.iValue = atoi(yytext);
                              yycolno+=strlen(yytext);printf("NUMBER ");return(NUMBER);}
