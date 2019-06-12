@@ -6,7 +6,7 @@ stack* newStack(int capacity)
 {
     stack *pt = (stack*)malloc(sizeof(stack));
 
-    pt->maxsize = capacity;
+    pt->max = capacity;
     pt->top = -1;
     pt->items = (int*)malloc(sizeof(int) * capacity);
 
@@ -28,7 +28,7 @@ int isEmpty(stack *pt)
 // Utility function to check if the stack is full or not
 int isFull(stack *pt)
 {
-    return pt->top == pt->maxsize - 1;  // or return size(pt) == pt->maxsize;
+    return pt->top == pt->max - 1;  // or return size(pt) == pt->maxsize;
 }
 
 // Utility function to add an element x in the stack
@@ -68,7 +68,7 @@ int pop(stack *pt)
         exit(EXIT_FAILURE);
     }
 
-    printf("Removing %d\n", peek(pt));
+    printf("Removing %d\n", top(pt));
 
     // decrement stack size by 1 and (optionally) return the popped element
     return pt->items[pt->top--];

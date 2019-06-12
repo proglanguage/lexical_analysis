@@ -3,6 +3,7 @@
 #define __STACK_H__
 
 #include <stdlib.h>
+#include <stdio.h>
 
 typedef struct stack{
     int max; // the max siz of the stack

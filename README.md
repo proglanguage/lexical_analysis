@@ -4,16 +4,17 @@ Lexical and Syntactical Analysis for our new language to be named afterwords
 ## Requirements
 
 + [Flex](https://www.gnu.org/software/flex/)
++ [GNUMake](http://gnu.org/software/make)
 
 ## Compiling & Using It
 
 Run the following comands on your system (if Unix based)
 
 ```bash
-lex lexer01.l
-yacc parser01.y -d -v # use -g if you desire to see a graph with the
-gcc lex.yy.c y.tab.c -o parser
-./parser < <file_name>
+make lexer
+make yacc
+make
+./bin/grace < <file_name>
 ```
 
 Remember of changing the `<file_name>` with the path to the file to be parsed.
