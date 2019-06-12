@@ -17,6 +17,8 @@ make
 ./bin/grace < <file_name>
 ```
 
+**OBS.:** To clean the files run `make clean`.
+
 Remember of changing the `<file_name>` with the path to the file to be parsed.
 We give an exemple of a quicksort on our language at `quicksort.txt` file on this repository.
 
