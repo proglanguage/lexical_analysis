@@ -50,10 +50,29 @@ procedure print_sum(TwoDimensionalMatrix m1, TwoDimensionalMatrix m2)
   print_matrix(matrix)
 end_procedure
 
+procedure print_product(TwoDimensionalMatrix m1, TwoDimensionalMatrix m2)
+  if m1.number_of_lines() != m2.number_of_columns() then
+    puts("Cannot calculate product because sizes are different.")
+    return
+  end_if
+
+  TwoDimensionalMatrix matrix
+  matrix.number_of_lines = m1.number_of_lines
+  matrix.number_of_columns = m2.number_of_columns
+
+  for(int line = 0; line < matrix.number_of_lines; line++)
+    for(int column = 0; column < matrix.number_of_columns; column++)
+      matrix.values[line][column] = m1[line][column] + m2[line][column]
+    end_for
+  end_for
+
+  print_matrix(matrix)
+end_procedure
+
 puts("Please enter the first matrix:")
 
 int[][] first_matrix = read_matrix()
 int[][] second_matrix = read_matrix()
 
 print_sum(first_matrix, second_matrix)
-# print_product(first_matrix, second_matrix)
+print_product(first_matrix, second_matrix)
