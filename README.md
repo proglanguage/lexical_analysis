@@ -1,4 +1,5 @@
 # Lexical Analysis
+
 Lexical and Syntactical Analysis for our new language to be named afterwords
 
 ## Requirements
