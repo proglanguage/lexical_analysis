@@ -1,3 +1,4 @@
+APPDIR = application
 BINDIR = bin
 SRCDIR = src
 INCLUDEDIR = include
@@ -13,6 +14,7 @@ CFLAGS = -I $(INCLUDEDIR)
 LDFLAGS =
 
 BIN = ${BINDIR}/grace
+APP = $(wildcard ${APPDIR}/*.c)
 
 SRC = $(wildcard $(SRCDIR)/*.c)
 OBJS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRC))
@@ -25,7 +27,7 @@ _TESTS = $(wildcard $(TESTDIR)/*.c)
 TESTS = $(patsubst %.c,%,$(_TESTS))
 
 $(BIN): $(OBJS)
-	$(CC) -o $(BIN) $(OBJS) $(CFLAGS) $(LDFLAGS)
+	$(CC) -o $(BIN) $(APP) $(OBJS) $(CFLAGS) $(LDFLAGS)
 
 ${OBJDIR}/%.o: $(SRCDIR)/%.c
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -44,8 +46,8 @@ test: $(TESTS)
 
 $(TESTDIR)/t_%: $(TESTDIR)/t_%.c $(OBJS)
 	$(CC) -o $@ $< $(OBJS) $(CFLAGS) $(LDFLAGS)
-	$@
-	
+	valgrind $@ --leak-check=full --show-leak-kinds=all --show-reachable=yes -v
+
 clean:
 	rm -f $(BIN) $(OBJS) $(APPOBJ)
 	rm -f $(TESTS)

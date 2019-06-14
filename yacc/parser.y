@@ -233,9 +233,9 @@ term: ids                    {printf("reduce to id\n");}
 
 %%
 
-int main (void) {
-  return yyparse();
-}
+// int parse () {
+  // return yyparse();
+// }
 
 int yyerror (char *msg) {
   fprintf (stderr, "%d: %s at '%s' in col %d\n", yylineno, msg, yytext, yycolno);

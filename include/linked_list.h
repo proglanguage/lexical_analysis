@@ -3,29 +3,42 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#define LISTEND -1
 
 typedef struct _cell_list
 {
     struct _cell_list* prev;
     struct _cell_list* next;
-    char* value;
+    void* value;
 }cell_list;
 
 
 typedef struct _list
 {
-    int capacity;
+    // int capacity;
+    int t_size;
+    int size;
     cell_list* head;
     cell_list* tail;
-    cell_list* body;
+
+    /** Methods **/
+    int (*push)(struct _list*, void*);
+    void* (*get)(struct _list*, int);
+    void* (*remove)(struct _list*, int);
+    int (*clean)(struct _list*);
+    int (*is_empty)(struct _list*);
 }list;
 
-int push(cell_list* val);
+list* create_ll(int t_size);
 
-cell_list* pop(cell_list* val);
+int push_in_ll(list* ll, void* val);
 
-int clean();
+void* get_from_ll(list* ll, int index);
 
-int isEmpty();
+void* remove_from_ll(list* ll, int index);
+
+int clean_ll(list* ll);
+
+int ll_is_empty(list* ll);
 
 #endif /** __LINKED_LIST_H__ **/

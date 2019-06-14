@@ -8,11 +8,12 @@
 
 typedef struct _var_info{
     char* type;
+    // void* content;
 }var_info;
 
 typedef struct _proc_info{
     char* return_type;
-    list* params;
+    var_info* params;
 }proc_info;
 
 
