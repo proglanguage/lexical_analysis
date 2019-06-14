@@ -31,7 +31,7 @@ ${OBJDIR}/%.o: $(SRCDIR)/%.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 lexer: ${LEXDIR}/*.l
-	lex -o $(SRCDIR)/lex.yy.c $<
+	lex --yylineno -o $(SRCDIR)/lex.yy.c $<
 
 bison: ${YACCDIR}/*.y
 	yacc $< -d -g -v

@@ -9,6 +9,7 @@
 
 ","                       {yycolno++;printf("COMMA ");return(COMMA);}
 "."                       {yycolno++;printf("DOT ");return(DOT);}
+":"                       {yycolno++;printf("SEMICOLON ");return(SEMICOLON);}
 [\r\n;]                   {yycolno=0;printf("ENDL\n");return(ENDL);}
 "+"                       {yycolno++;printf("PLUS ");return(PLUS);}
 "-"                       {yycolno++;printf("MINUS ");return(MINUS);}
@@ -57,7 +58,7 @@
 "char"                    {yycolno+=4;printf("CHAR ");return(CHAR);}
 "str"                     {yycolno+3;printf("STRING ");return(STRING);}
 "bool"                    {yycolno+4;printf("BOOLEAN ");return(BOOLEAN);}
-
+"struct"                  {yycolno+4;printf("STRUCT ");return(STRUCT);}
 
 "#".*[\r\n]               {printf("COMMENT\n");}
 "#".*                     {printf("COMMENT ");}

@@ -1,4 +1,4 @@
-TwoDimensionalMatrix = struct {
+TwoDimensionalMatrix : struct {
   int number_of_lines
   int number_of_columns
   int[][] values
@@ -13,8 +13,8 @@ TwoDimensionalMatrix function read_matrix()
   puts("What is the number of columns?")
   matrix.number_of_columns = (int) gets
 
-  for(int line = 0; line < matrix.number_of_lines; line++)
-    for(int column = 0; column < matrix.number_of_columns; column++)
+  for(int line = 0, line < matrix.number_of_lines, line++)
+    for(int column = 0, column < matrix.number_of_columns, column++)
       puts("Value for line %d column %d:", i, j)
       matrix.values[line][column] = (int) gets
     end_for
@@ -41,8 +41,8 @@ procedure print_sum(TwoDimensionalMatrix m1, TwoDimensionalMatrix m2)
   matrix.number_of_lines = m1.number_of_lines
   matrix.number_of_columns = m1.number_of_columns
 
-  for(int line = 0; line < matrix.number_of_lines; line++)
-    for(int column = 0; column < matrix.number_of_columns; column++)
+  for(int line = 0, line < matrix.number_of_lines, line++)
+    for(int column = 0, column < matrix.number_of_columns, column++)
       matrix.values[line][column] = m1[line][column] + m2[line][column]
     end_for
   end_for
@@ -60,8 +60,8 @@ procedure print_product(TwoDimensionalMatrix m1, TwoDimensionalMatrix m2)
   matrix.number_of_lines = m1.number_of_lines
   matrix.number_of_columns = m2.number_of_columns
 
-  for(int line = 0; line < matrix.number_of_lines; line++)
-    for(int column = 0; column < matrix.number_of_columns; column++)
+  for(int line = 0, line < matrix.number_of_lines, line++)
+    for(int column = 0, column < matrix.number_of_columns, column++)
       matrix.values[line][column] = m1[line][column] + m2[line][column]
     end_for
   end_for
