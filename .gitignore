@@ -64,3 +64,5 @@ y.tab.h
 bin/grace
 
 !*.keep
+/test/
+!/test/*.c
