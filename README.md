@@ -5,7 +5,10 @@ Lexical and Syntactical Analysis for our new language to be named afterwords
 ## Requirements
 
 + [Flex](https://www.gnu.org/software/flex/)
++ [Bison](https://www.gnu.org/software/bison/)
 + [GNUMake](http://gnu.org/software/make)
+* [Valgrind](http://www.valgrind.org/)
++ [ld](https://linux.die.net/man/1/ld)
 
 ## Compiling & Using It
 
@@ -24,7 +27,7 @@ make grace
 ```
 
 Remember of changing the `<file_name>` with the path to the file to be parsed.
-We give an exemple of a quicksort on our language at `quicksort.txt` file on this repository.
+We give examples of code in our language at the `examples` directory on this repository.
 
 **OBS.:** To clean the files run `make clean`. To test run `make test`.
 
