@@ -28,6 +28,8 @@
 ">"                       {yycolno++;printf("BIG ");return(BIG);}
 "="                       {yycolno++;printf("ASSIGN ");return(ASSIGN);}
 "=="                      {yycolno+=2;printf("EQ ");return(EQ);}
+"!="                      {yycolno+=2;printf("NEQ ");return(NEQ);}
+"!"                       {yycolno+=1;printf("NEG ");return(NEG);}
 "and"                     {yycolno+=3;printf("AND ");return(AND);}
 "or"                      {yycolno+=2;printf("OR ");return(OR);}
 "true"                    {yycolno+=4;printf("TRUE ");return(TRUE);}
@@ -46,6 +48,7 @@
 "while"                   {yycolno+=5;printf("WHILE ");return(WHILE);}
 "end_while"               {yycolno+=9;printf("END_WHILE ");return(END_WHILE);}
 "for"                     {yycolno+=3;printf("FOR ");return(FOR);}
+"in"                      {yycolno+=2;printf("IN ");return(IN);}
 "end_for"                 {yycolno+=7;printf("END_FOR ");return(END_FOR);}
 "break"                   {yycolno+=5;printf("BREAK ");return(BREAK);}
 "loop"                    {yycolno+=4;printf("LOOP ");return(LOOP);}
