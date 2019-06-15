@@ -14,6 +14,7 @@ void test_get();
 void test_remove();
 
 int main(void){
+    fprintf(stdout,"[INFO] - Start linked list test.\n");
     #ifdef DEBUG
         debug = stderr;
         // debug = fopen("debug.log","w+");
@@ -33,6 +34,8 @@ int main(void){
     #ifdef DEBUG
         fprintf(debug, "[TEST] - End of remove method test\n");
     #endif
+    fprintf(stdout,"[INFO] - End linked list test.\n");
+    return 0;
 }
 
 void test_push(){
@@ -52,7 +55,7 @@ void test_push(){
     #endif
     assert(ll->push(ll, in));
     ll->clean(ll);
-    free(ll);
+    // free(ll);
 }
 
 void test_get(){
@@ -82,12 +85,12 @@ void test_get(){
     #ifdef DEBUG
         fprintf(debug, "[INFO] - List size = %d\n", ll->size);
         for(in = 0; in < ll->size; in++){
-            fprintf(debug, "[INFO] - l[%d]=%d\n", in, ll->get(ll, in));
+            fprintf(debug, "[INFO] - l[%d]=%d, l[%d]=%d, l[%d]=%d\n", in - 1, ll->get(ll, in - 1), in, ll->get(ll, in), in + 1, ll->get(ll, in + 1));
         }
     #endif
     assert(((int) ll->get(ll, 1)) == 1);
     ll->clean(ll);
-    free(ll);
+    // free(ll);
 }
 
 void test_remove(){
@@ -116,19 +119,19 @@ void test_remove(){
     #ifdef DEBUG
         fprintf(debug, "[INFO] - List size = %d\n", ll->size);
         for(in = 0; in < ll->size; in++){
-            fprintf(debug, "[INFO] - l[%d]=%d\n", in, ll->get(ll, in));
+            fprintf(debug, "[INFO] - l[%d]=%d, l[%d]=%d, l[%d]=%d\n", in - 1, ll->get(ll, in - 1), in, ll->get(ll, in), in + 1, ll->get(ll, in + 1));
         }
     #endif
     assert(((int) ll->remove(ll, 1)) == 1);
     #ifdef DEBUG
         fprintf(debug, "[INFO] - List size = %d\n", ll->size);
         for(in = 0; in < ll->size; in++){
-            fprintf(debug, "[INFO] - l[%d]=%d\n", in, ll->get(ll, in));
+            fprintf(debug, "[INFO] - l[%d]=%d, l[%d]=%d, l[%d]=%d\n", in - 1, ll->get(ll, in - 1), in, ll->get(ll, in), in + 1, ll->get(ll, in + 1));
         }
     #endif
     assert(((int) ll->get(ll, 1)) == 0);
     ll->clean(ll);
-    free(ll);
+    // free(ll);
 }
 
 void test_clean(){
@@ -162,5 +165,5 @@ void test_clean(){
     #endif
     assert(ll->clean(ll) == 1);
     ll->clean(ll);
-    free(ll);
+    // free(ll);
 }

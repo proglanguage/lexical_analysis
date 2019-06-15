@@ -83,23 +83,66 @@ int ht_insert(hash_table* ht, node* value){
     }
     int i = 0;
     cell_list* current = ll->head;
+    #ifdef DEBUG
+        fprintf(stderr,"[INFO] - Startup lookup for key %s\n", value->key);
+    #endif
     for(i = 0; i < ll->size; i++){
         node* n = (node*) current->value;
-        if (strcmp(value->key, n->key)) {
+        #ifdef DEBUG
+            fprintf(stderr,"[INFO] - Verifying equality of %s and %s\n", value->key, n->key);
+        #endif
+        if (strcmp(value->key, n->key) == 0) {
+            #ifdef DEBUG
+                fprintf(stderr,"[INFO] - Key %s already in table\n", n->key);
+            #endif
             return 0;
         }
+        current = current->next;
     }
+    #ifdef DEBUG
+        fprintf(stderr,"[INFO] - Inserting %s\n", value->key);
+    #endif
+    ll->push(ll, value);
     return 1;
 }
 
 node* ht_get(hash_table* ht, char* key){
-    list* items = (list*) ht->items[ht->hash(key)%ht->size];
-    int i = 0;
-    for(i = 0; i < items->size; i++){
-        // node* n = (node*) items->get(items, key);
+    int pos = ht->hash(key)%ht->size;
+    #ifdef DEBUG
+        fprintf(stderr,"[INFO] - getting items at column %d on table\n", pos);
+    #endif
+    list* ll = (list*) ht->items[pos];
+    #ifdef DEBUG
+        fprintf(stderr,"[INFO] - check if items list is empty\n");
+    #endif
+    if (ll->is_empty(ll)) {
+        #ifdef DEBUG
+            fprintf(stderr,"[INFO] - List is empty. Element not inserted\n");
+        #endif
+        return NULL;
     }
-    node* val;
-    return val;
+    int i = 0;
+    cell_list* current = ll->head;
+    #ifdef DEBUG
+        fprintf(stderr,"[INFO] - Startup lookup for key %s\n", key);
+    #endif
+    for(i = 0; i < ll->size; i++){
+        node* n = (node*) current->value;
+        #ifdef DEBUG
+            fprintf(stderr,"[INFO] - Verifying equality of %s and %s\n", key, n->key);
+        #endif
+        if (strcmp(key, n->key) == 0) {
+            #ifdef DEBUG
+                fprintf(stderr,"[INFO] - Found key %s in table\n", n->key);
+            #endif
+            return n;
+        }
+        current = current->next;
+    }
+    #ifdef DEBUG
+        fprintf(stderr,"[INFO] - Found no key %s\n", key);
+    #endif
+    return NULL;
 }
 
 node* ht_purge(hash_table* ht, char* key){
@@ -108,5 +151,11 @@ node* ht_purge(hash_table* ht, char* key){
 }
 
 int destroy_ht(hash_table* ht){
-    return 0;
+    int i = 0;
+    for(i = 0; i < ht->size; i++) {
+        ((list*) ht->items[i])->clean((list*) ht->items[i]);
+    }
+    free(ht->items);
+    free(ht);
+    return 1;
 }

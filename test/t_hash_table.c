@@ -31,6 +31,11 @@ int main(){
     test_insert();
     #ifdef DEBUG
         fprintf(debug, "[TEST] - End of insert method test\n");
+        fprintf(debug, "[TEST] - Starting get method test\n");
+    #endif
+    test_get();
+    #ifdef DEBUG
+        fprintf(debug, "[TEST] - End of get method test\n");
         // fprintf(debug, "[TEST] - Starting insert method test\n");
     #endif
     
@@ -56,7 +61,6 @@ void test_create_hash_table(){
         fprintf(debug,"[INFO] - size attribute is correct\n");
     #endif
     ht->destroy(ht);
-    free(ht);
 }
 
 void test_insert(){
@@ -87,10 +91,11 @@ void test_insert(){
     #ifdef DEBUG
         fprintf(debug,"[INFO] - Insertion of the third element\n");
     #endif
-    assert(ht->insert(ht, &n3));
+    assert(!ht->insert(ht, &n3));
     #ifdef DEBUG
         fprintf(debug,"[INFO] - Insertion succeeded\n");
     #endif
+    ht->destroy(ht);
 }
 
 void test_get(){
@@ -114,7 +119,7 @@ void test_get(){
     #endif
     assert(ht->insert(ht, &n2));
     node n3;
-    n3.key = "foo";
+    n3.key = "foo2";
     inf = malloc(sizeof(var_info));
     inf->type = "bar2";
     n3.value.var = inf;
@@ -123,7 +128,17 @@ void test_get(){
     #endif
     assert(ht->insert(ht, &n3));
     #ifdef DEBUG
-        fprintf(debug,"[INFO] - Insertion succeeded\n");
+        fprintf(debug,"[INFO] - Getting the 'foo' node\n");
     #endif
+    assert(strcmp(ht->get(ht, "foo")->key, "foo") == 0);
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Succeeded\n");
+    #endif
+    ht->destroy(ht);
 }
 
+
+void test_purge();
+
+// void test_destroy(){
+// }
