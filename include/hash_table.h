@@ -10,6 +10,7 @@
 typedef union _info {
     var_info* var;
     proc_info* proc;
+    func_info* func;
 }info;
 
 typedef struct _node

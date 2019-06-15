@@ -140,6 +140,9 @@ void* remove_from_ll(list* ll, int index){
         new_head->prev = ll->tail;
         ll->tail->next = new_head;
         free(ll->head);
+        #ifdef DEBUG
+            fprintf(stderr, "[INFO] - Previous linked list head freeded\n");
+        #endif
         ll->head = new_head;
         ll->size--;
         return value;
@@ -190,12 +193,25 @@ void* remove_from_ll(list* ll, int index){
 }
 
 int clean_ll(list* ll){
+    #ifdef DEBUG
+        fprintf(stderr, "[INFO] - Cleaning linked list\n");
+    #endif
     while (!ll->is_empty(ll)) {
+        #ifdef DEBUG
+            fprintf(stderr, "[INFO] - Removing element %d\n", ll->head->value);
+        #endif
         ll->remove(ll,0);
     }
+    #ifdef DEBUG
+        fprintf(stderr, "[INFO] - All elements removed\n");
+    #endif
+    free(ll);
     return 1;
 }
 
 int ll_is_empty(list* ll){
+    #ifdef DEBUG
+        ll->size==0?fprintf(stderr, "[INFO] - Empty linked list\n"):fprintf(stderr, "[INFO] - Linked list not empty\n");
+    #endif
     return ll->size==0?1:0;
 }

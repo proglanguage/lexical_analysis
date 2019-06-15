@@ -60,3 +60,5 @@ y.tab.c
 y.tab.h
 
 */.vscode/
+
+bin/grace
