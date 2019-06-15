@@ -62,3 +62,5 @@ y.tab.h
 */.vscode/
 
 bin/grace
+
+!*.keep
