@@ -61,7 +61,7 @@ int push_in_ll(list* ll, void* val){
         return -1;
     }
     item->value = malloc(ll->t_size);
-    if (item == NULL) {
+    if (item->value == NULL) {
         fprintf(stderr, "[ERROR] - Something go wrong on malloc\n");
         return -1;
     }

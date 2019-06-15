@@ -1,8 +1,8 @@
 #include "hash_table.h"
 
-#ifndef DEBUG
-#define DEBUG
-#endif
+// #ifndef DEBUG
+// #define DEBUG
+// #endif
 
 hash_table* create_ht(int size){
     hash_table* val = (hash_table*) malloc(sizeof(hash_table));
@@ -146,16 +146,56 @@ node* ht_get(hash_table* ht, char* key){
 }
 
 node* ht_purge(hash_table* ht, char* key){
-    node* val = (node*) ht->items[ht->hash(key)%ht->size];
-    return val;
+    list* ll = (list*) ht->items[ht->hash(key)%ht->size];
+    if (ll == NULL || ll->is_empty(ll)) {
+        #ifdef DEBUG
+            fprintf(stderr,"[INFO] - Empty list\n");
+        #endif
+        return NULL;
+    }
+    if (ll->size == 1 && strcmp(key,((node*) ll->head->value)->key) == 0){
+        #ifdef DEBUG
+            fprintf(stderr,"[INFO] - Removing %s in index %d\n", key, 0);
+        #endif
+        return (node*) ll->remove(ll, 0);
+    }
+    int i = 0;
+    #ifdef DEBUG
+        fprintf(stderr,"[INFO] - Start search\n");
+    #endif
+    cell_list* tmp = ll->head;
+    while(tmp != NULL && strcmp(key,((node*) tmp->value)->key)){
+        tmp = tmp->next;
+        i++;
+    }
+    if(tmp != NULL){
+        #ifdef DEBUG
+            fprintf(stderr,"[INFO] - Removing %s in index %d\n", key, i);
+        #endif
+        node *val = ll->remove(ll,i);
+        return val;
+    }
+    #ifdef DEBUG
+        fprintf(stderr,"[INFO] - Key %s not in table\n", key);
+    #endif
+    return NULL;
 }
 
 int destroy_ht(hash_table* ht){
     int i = 0;
+    #ifdef DEBUG
+        fprintf(stderr,"[INFO] - Cleaning table\n");
+    #endif
     for(i = 0; i < ht->size; i++) {
         ((list*) ht->items[i])->clean((list*) ht->items[i]);
     }
+    #ifdef DEBUG
+        fprintf(stderr,"[INFO] - Table cleaned\n");
+    #endif
     free(ht->items);
+    #ifdef DEBUG
+        fprintf(stderr,"[INFO] - Freeing pointers\n");
+    #endif
     free(ht);
     return 1;
 }

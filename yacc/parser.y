@@ -68,8 +68,8 @@ void generate(node *tree);
  /* OPERATORS */
 %token ASSIGN
 %token PLUS MINUS TIMES DIVIDE  POWER
-%token LESS_EQ BIG_EQ LESS BIG EQ
-%token AND OR
+%token LESS_EQ BIG_EQ LESS BIG EQ NEQ
+%token AND OR NEG
 
  /* TYPES */
 %token INTEGER
@@ -90,14 +90,15 @@ stmts: stmt                 {printf("reduce to statement rule 1\n");}
      | stmts ENDL stmt      {printf("reduce to statement rule 2\n");}
      ;
 
-stmt:                {printf("reduce to stmt vazio\n");}
-    | declare        {printf("reduce to declare\n");}
-    | structs        {printf("reduce to structs\n");}
+stmt:                 {printf("reduce to stmt vazio\n");}
+    | declare         {printf("reduce to declare\n");}
+    | structs         {printf("reduce to structs\n");}
     // | assign         {printf("reduce to assign\n");}
-    | exp            {printf("reduce to exp\n");}
-    | BREAK          {printf("reduce to break\n");}
-    | EXIT NUMBER    {printf("reduce to exit\n");}
-    | RETURN exps    {printf("reduce to return\n");}
+    | exp             {printf("reduce to exp\n");}
+    | BREAK           {printf("reduce to break\n");}
+    | EXIT NUMBER     {printf("reduce to exit\n");}
+    | RETURN exp      {printf("reduce to return\n");}
+    | RETURN          {printf("reduce to return\n");}
     | ids ASSIGN exps {printf("reduce to assign\n");}
     ;
 
@@ -163,6 +164,7 @@ params:                                                {}
       ;
 
 param: types ID                          {printf("reduce to param\n");}
+     | id id                             {printf("reduce to param\n");}
      ;
 
 exps: exp              {printf("reduce to exp\n");}
@@ -181,6 +183,8 @@ exp: term                                        {printf("reduce to term\n");}
    | exp BIG term                                {printf("reduce to big\n");}
    | exp BIG_EQ term                             {printf("reduce to big equal\n");}
    | exp EQ term                                 {printf("reduce to equal\n");}
+   | exp NEQ term                                {printf("reduce to not equal\n");}
+   | NEG exp                                     {printf("reduce to negate\n");}
    | exp AND term                                {printf("reduce to and\n");}
    | exp OR term                                 {printf("reduce to or\n");}
    | exp DOT term                                {printf("reduce to dot\n");}

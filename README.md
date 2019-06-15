@@ -12,19 +12,24 @@ Lexical and Syntactical Analysis for our new language to be named afterwords
 
 ## Compiling & Using It
 
+Create the necessary dirctories
+
+```bash
+make dirs
+```
+
 Run the following comands on your system (if Unix based)
 
 ```bash
-make lexer
-make yacc
-make
+make lexer yacc
+make grace
 ./bin/grace < <file_name>
 ```
 
-**OBS.:** To clean the files run `make clean`.
-
 Remember of changing the `<file_name>` with the path to the file to be parsed.
 We give examples of code in our language at the `examples` directory on this repository.
+
+**OBS.:** To clean the files run `make clean`. To test run `make test`.
 
 ## References
 
