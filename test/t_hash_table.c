@@ -1,10 +1,10 @@
 #include "hash_table.h"
 #include <assert.h>
 
-#ifndef DEBUG
-#define DEBUG
-FILE* debug;
-#endif
+// #ifndef DEBUG
+// #define DEBUG
+// FILE* debug;
+// #endif
 
 void test_hash();
 void test_create_hash_table();
@@ -14,6 +14,7 @@ void test_purge();
 void test_destroy();
 
 int main(){
+    fprintf(stderr, "[INFO] - Start hash table test.");
     #ifdef DEBUG
         debug = stderr;
         fprintf(debug, "[TEST] - Starting hash test\n");
@@ -36,9 +37,14 @@ int main(){
     test_get();
     #ifdef DEBUG
         fprintf(debug, "[TEST] - End of get method test\n");
+        fprintf(debug, "[TEST] - Starting purge method test\n");
+    #endif
+    test_purge();
+    #ifdef DEBUG
+        fprintf(debug, "[TEST] - End of purge method test\n");
         // fprintf(debug, "[TEST] - Starting insert method test\n");
     #endif
-    
+    fprintf(stderr, "[INFO] - End of hash table test.");
     return 0;
 }
 
@@ -105,28 +111,19 @@ void test_get(){
     var_info* inf = malloc(sizeof(var_info));
     inf->type = "bar";
     n1.value.var = inf;
-    #ifdef DEBUG
-        fprintf(debug,"[INFO] - Insertion of the first element\n");
-    #endif
     assert(ht->insert(ht, &n1));
     node n2;
     n2.key = "bar";
     inf = malloc(sizeof(var_info));
     inf->type = "foo";
     n2.value.var = inf;
-    #ifdef DEBUG
-        fprintf(debug,"[INFO] - Insertion of the second element\n");
-    #endif
-    assert(ht->insert(ht, &n2));
+    ht->insert(ht, &n2);
     node n3;
     n3.key = "foo2";
     inf = malloc(sizeof(var_info));
     inf->type = "bar2";
     n3.value.var = inf;
-    #ifdef DEBUG
-        fprintf(debug,"[INFO] - Insertion of the third element\n");
-    #endif
-    assert(ht->insert(ht, &n3));
+    ht->insert(ht, &n3);
     #ifdef DEBUG
         fprintf(debug,"[INFO] - Getting the 'foo' node\n");
     #endif
@@ -134,11 +131,81 @@ void test_get(){
     #ifdef DEBUG
         fprintf(debug,"[INFO] - Succeeded\n");
     #endif
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Getting the 'bar' node\n");
+    #endif
+    assert(strcmp(ht->get(ht, "bar")->key, "foo") != 0);
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Succeeded\n");
+    #endif
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Getting the 'bar2' node\n");
+    #endif
+    assert(ht->get(ht, "bar2") == NULL);
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Succeeded on failling\n");
+    #endif
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Getting the 'foo2' node\n");
+    #endif
+    assert(strcmp(ht->get(ht, "foo2")->key, "foo2") == 0);
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Succeeded\n");
+    #endif
     ht->destroy(ht);
 }
 
 
-void test_purge();
+void test_purge(){
+    hash_table* ht = create_ht(10);
+    node n1;
+    n1.key = "foo";
+    var_info* inf = malloc(sizeof(var_info));
+    inf->type = "bar";
+    n1.value.var = inf;
+    ht->insert(ht, &n1);
+    node n2;
+    n2.key = "bar";
+    inf = malloc(sizeof(var_info));
+    inf->type = "foo";
+    n2.value.var = inf;
+    ht->insert(ht, &n2);
+    node n3;
+    n3.key = "foo2";
+    inf = malloc(sizeof(var_info));
+    inf->type = "bar2";
+    n3.value.var = inf;
+    ht->insert(ht, &n3);
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Purging the 'foo2' node\n");
+    #endif
+    assert(strcmp(ht->purge(ht, "foo2")->key, "foo2") == 0);
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Succeeded\n");
+    #endif
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Purging the 'bar' node\n");
+    #endif
+    assert(strcmp(ht->purge(ht, "bar")->key, "foo") != 0);
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Succeeded\n");
+    #endif
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Purging the 'bar2' node\n");
+    #endif
+    assert(ht->purge(ht, "bar2") == NULL);
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Succeeded on failling\n");
+    #endif
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Purging the 'foo' node\n");
+    #endif
+    assert(strcmp(ht->purge(ht, "foo")->key, "foo") == 0);
+    #ifdef DEBUG
+        fprintf(debug,"[INFO] - Succeeded\n");
+    #endif
+    ht->destroy(ht);
+}
 
 // void test_destroy(){
 // }

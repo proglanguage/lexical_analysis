@@ -1,3 +1,4 @@
+APPNAME = grace
 APPDIR = application
 BINDIR = bin
 SRCDIR = src
@@ -13,7 +14,7 @@ CC = gcc
 CFLAGS = -I $(INCLUDEDIR)
 LDFLAGS =
 
-BIN = ${BINDIR}/grace
+BIN = ${BINDIR}/${APPNAME}
 APP = $(wildcard ${APPDIR}/*.c)
 
 SRC = $(wildcard $(SRCDIR)/*.c)
@@ -26,7 +27,7 @@ _YACC = $(wildcard $(YACCDIR)/*.y)
 _TESTS = $(wildcard $(TESTDIR)/*.c)
 TESTS = $(patsubst %.c,%,$(_TESTS))
 
-$(BIN): $(OBJS)
+${APPNAME}: $(OBJS)
 	$(CC) -o $(BIN) $(APP) $(OBJS) $(CFLAGS) $(LDFLAGS)
 
 ${OBJDIR}/%.o: $(SRCDIR)/%.c

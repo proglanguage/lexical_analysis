@@ -4,10 +4,10 @@
 #include "linked_list.h"
 
 
-#ifndef DEBUG
-#define DEBUG
-FILE* debug;
-#endif
+// #ifndef DEBUG
+// #define DEBUG
+// FILE* debug;
+// #endif
 
 void test_push();
 void test_get();
