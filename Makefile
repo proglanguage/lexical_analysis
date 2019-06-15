@@ -37,10 +37,7 @@ lexer: ${LEXDIR}/*.l
 	lex --yylineno -o $(SRCDIR)/lex.yy.c $<
 
 bison: ${YACCDIR}/*.y
-	yacc $< -d -g -v
-	mv y.tab.h $(INCLUDEDIR)/
-	mv y.tab.c $(SRCDIR)/
-	mv y.dot $(GDIR)/
+	yacc $< --defines=${INCLUDEDIR}/y.tab.h --graph=${GDIR}/y.dot --report-file=${YOUTDIR}/y.output -v --output=${SRCDIR}/y.tab.c
 
 test: $(TESTS) 
 	$(info ************  Testes concluídos com sucesso! ************)
@@ -54,3 +51,6 @@ clean:
 	rm -f $(TESTS)
 	rm -f $(SRCDIR)/lex.yy.c $(SRCDIR)/y.tab.c $(INCLUDEDIR)/y.tab.h
 	rm -f y.output $(GDIR)/y.dot
+
+dirs:
+	mkdir -p ${APPDIR} ${BINDIR} ${SRCDIR} ${INCLUDEDIR} ${LEXDIR} ${YACCDIR} ${OBJDIR} ${TESTDIR} ${GDIR} ${YOUTDIR}

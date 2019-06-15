@@ -9,6 +9,12 @@ Lexical and Syntactical Analysis for our new language to be named afterwords
 
 ## Compiling & Using It
 
+Create the necessary dirctories
+
+```bash
+make dirs
+```
+
 Run the following comands on your system (if Unix based)
 
 ```bash
