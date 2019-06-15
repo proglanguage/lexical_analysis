@@ -8,7 +8,7 @@ stack* newStack(int capacity)
 
     pt->max = capacity;
     pt->top = -1;
-    pt->items = (int*)malloc(sizeof(int) * capacity);
+    pt->items = (char**)malloc(sizeof(char*) * capacity);
 
     return pt;
 }
@@ -32,7 +32,7 @@ int isFull(stack *pt)
 }
 
 // Utility function to add an element x in the stack
-void push(stack *pt, int x)
+void push(stack *pt, char* x)
 {
     // check if stack is already full. Then inserting an element would
     // lead to stack overflow
@@ -42,14 +42,14 @@ void push(stack *pt, int x)
         exit(EXIT_FAILURE);
     }
 
-    printf("Inserting %d\n", x);
+    printf("Inserting %s\n", x);
 
     // add an element and increments the top index
     pt->items[++pt->top] = x;
 }
 
 // Utility function to return top element in a stack
-int top(stack *pt)
+char* top(stack *pt)
 {
     // check for empty stack
     if (!isEmpty(pt))
@@ -59,7 +59,7 @@ int top(stack *pt)
 }
 
 // Utility function to pop top element from the stack
-int pop(stack *pt)
+char* pop(stack *pt)
 {
     // check for stack underflow
     if (isEmpty(pt))
@@ -68,7 +68,7 @@ int pop(stack *pt)
         exit(EXIT_FAILURE);
     }
 
-    printf("Removing %d\n", top(pt));
+    printf("Removing %s\n", top(pt));
 
     // decrement stack size by 1 and (optionally) return the popped element
     return pt->items[pt->top--];

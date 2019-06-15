@@ -8,7 +8,7 @@
 typedef struct stack{
     int max; // the max siz of the stack
     int top; // The element in top of the stack
-    int* items; // vector of elements in the stack
+    char** items; // vector of elements in the stack
 }stack;
 
 // Utility function to initialize stack
@@ -24,12 +24,12 @@ int isEmpty(stack *pt);
 int isFull(stack *pt);
 
 // Utility function to add an element x in the stack
-void push(stack *pt, int x);
+void push(stack *pt, char* x);
 
 // Utility function to return top element in a stack
-int top(stack *pt);
+char* top(stack *pt);
 
 // Utility function to pop top element from the stack
-int pop(stack *pt);
+char* pop(stack *pt);
 
 #endif /** __STACK_H__ **/

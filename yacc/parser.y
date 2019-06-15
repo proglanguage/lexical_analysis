@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "stack.h"
 
 typedef struct node
 {
@@ -57,11 +58,12 @@ void generate(node *tree);
 %token EXIT
 %token BREAK
 %token RETURN
- /* %token SEMICOLON */
+%token SEMICOLON
 
  /*CONTROL STRUCTURES*/
 %token PROCEDURE END_PROCEDURE FUNCTION END_FUNCTION IF THEN ELSE END_IF
-%token DO WHILE END_WHILE FOR END_FOR LOOP END_LOOP
+%token DO WHILE END_WHILE FOR IN END_FOR LOOP END_LOOP
+%token STRUCT
 
  /* OPERATORS */
 %token ASSIGN
@@ -91,134 +93,149 @@ stmts: stmt                 {printf("reduce to statement rule 1\n");}
 stmt:                {printf("reduce to stmt vazio\n");}
     | declare        {printf("reduce to declare\n");}
     | structs        {printf("reduce to structs\n");}
-    | assign         {printf("reduce to assign\n");}
-    | exp            {}
-    | BREAK          {}
-    | EXIT NUMBER    {}
-    | RETURN exps    {}
+    // | assign         {printf("reduce to assign\n");}
+    | exp            {printf("reduce to exp\n");}
+    | BREAK          {printf("reduce to break\n");}
+    | EXIT NUMBER    {printf("reduce to exit\n");}
+    | RETURN exps    {printf("reduce to return\n");}
+    | ids ASSIGN exps {printf("reduce to assign\n");}
     ;
 
-structs: PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_PROCEDURE                   {}
-       | types FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_FUNCTION               {}
-       | WHILE exps DO ENDL stmts END_WHILE                                                                {}
-       | LOOP ENDL stmts END_LOOP                                                                          {}
+structs: PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_PROCEDURE                   {printf("reduce to procedure\n");}
+       | types FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_FUNCTION               {printf("reduce to function\n");}
+       | ids FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_FUNCTION                 {printf("reduce to function\n");}
+       | WHILE exps DO ENDL stmts END_WHILE                                                                {printf("reduce to while\n");}
+       | LOOP ENDL stmts END_LOOP                                                                          {printf("reduce to loop\n");}
+       | ID SEMICOLON STRUCT LEFT_KEY ENDL declist ENDL RIGHT_KEY                                          {printf("reduce to struct\n");}
        | if                                                                                                {printf("reduce to if\n");}
+       | for                                                                                               {printf("reduce to for\n");}
        ;
 
-if: IF exps THEN ENDL stmts elseifs END_IF       {}
+if: IF exps THEN ENDL stmts elseifs END_IF       {printf("reduce to preif\n");}
   ;
 
-elseifs: else            {printf("reduce to else if\n");}
-       | elseif elseifs  {}
+elseifs: else            {printf("reduce to else after elseifs\n");}
+       | elseif elseifs  {printf("reduce to elsifs\n");}
        ;
 
-elseif: ELSE IF exps THEN ENDL stmts  {}
+elseif: ELSE IF exps THEN ENDL stmts  {printf("reduce to else if\n");}
       ;
 
 else:
     | ELSE ENDL stmts                                      {printf("reduce to else\n");}
     ;
 
-cast: LEFT_PARENTHESIS types RIGHT_PARENTHESIS             {}
-    ;
-
-assign: ids ASSIGN exps             {}
-      // | ids ASSIGN cast exps        {}
-      | ID PLUS PLUS                {}
-      | ID MINUS MINUS              {}
-      ;
-
-ids: ID                      {}
-   | ids COMMA ID            {}
-   | ID array_ops            {}
-   | ids COMMA ID array_ops  {}
-   ;
-
-declare: types ids     {}
-       | types assign  {}
+declist: declare                {printf("reduce to declare on declist\n");}
+       | declist ENDL declare   {printf("reduce to declist\n");}
        ;
 
+for: FOR forcond stmts END_FOR         {printf("reduce to for\n");}
+   ;
+
+forcond: ID IN exp ENDL                                           {printf("reduce to forcond\n");}
+       | LEFT_PARENTHESIS declare RIGHT_PARENTHESIS                  {printf("reduce to forcond\n");}
+       ;
+
+cast: LEFT_PARENTHESIS types RIGHT_PARENTHESIS             {printf("reduce to cast\n");}
+    ;
+
+// assign: ids ASSIGN exps             {printf("reduce to multiple assignment\n");}
+//       ;
+
+ids: id                      {printf("reduce to id\n");}
+   | ids id                  {printf("reduce to ids");}
+   | ids COMMA id            {printf("reduce to ids\n");}
+   | ids DOT id              {printf("reduce to ids\n");}
+  //  | ids COMMA ID array_ops  {printf("reduce to arrays\n");}
+   ;
+
+id: ID                      {printf("reduce to id\n");}
+  | ID array_ops            {printf("reduce to array\n");}
+  ;
+
+declare: types ids                 {printf("reduce to declare\n");}
+       | types ids ASSIGN exps     {printf("reduce to declare with assign\n");}
+       ;
 
 params:                                                {}
-      | param                                          {}
-      | params COMMA param                             {}
+      | param                                          {printf("reduce to param\n");}
+      | params COMMA param                             {printf("reduce to params\n");}
       ;
 
-param: types ID                          {}
+param: types ID                          {printf("reduce to param\n");}
      ;
 
-exps: exp              {}
-    | exps exp         {}
-    // | exps LEFT_PARENTHESIS RIGHT_PARENTHESIS      {}
-    // | exps LEFT_PARENTHESIS exp RIGHT_PARENTHESIS      {}
+exps: exp              {printf("reduce to exp\n");}
+    // | LEFT_PARENTHESIS exp RIGHT_PARENTHESIS  {printf("reduce to exp(exp)\n");}
+    | exps exp         {printf("reduce to exps\n");}
     ;
 
-exp: term                                        {}
-   | exp PLUS term                               {}
-   | exp TIMES term                              {}
-   | exp DIVIDE term                             {}
-   | exp MINUS term                              {}
-   | exp POWER term                              {}
-   | exp LESS term                               {}
-   | exp LESS_EQ term                            {}
-   | exp BIG term                                {}
-   | exp BIG_EQ term                             {}
-   | exp EQ term                                 {}
-   | exp AND term                                {}
-   | exp OR term                                 {}
-   | exp DOT term                                {}
-   | exp COMMA term                              {}
-   | exp LEFT_PARENTHESIS RIGHT_PARENTHESIS      {}
-   | exp LEFT_PARENTHESIS exp RIGHT_PARENTHESIS  {}
-   | LEFT_PARENTHESIS exp RIGHT_PARENTHESIS      {} 
-  //  | proc                                        {}
+exp: term                                        {printf("reduce to term\n");}
+   | exp PLUS term                               {printf("reduce to adition\n");}
+   | exp TIMES term                              {printf("reduce to multiplication\n");}
+   | exp DIVIDE term                             {printf("reduce to division\n");}
+   | exp MINUS term                              {printf("reduce to subtraction\n");}
+   | exp POWER term                              {printf("reduce to power\n");}
+   | exp LESS term                               {printf("reduce to less\n");}
+   | exp LESS_EQ term                            {printf("reduce to less equal\n");}
+   | exp BIG term                                {printf("reduce to big\n");}
+   | exp BIG_EQ term                             {printf("reduce to big equal\n");}
+   | exp EQ term                                 {printf("reduce to equal\n");}
+   | exp AND term                                {printf("reduce to and\n");}
+   | exp OR term                                 {printf("reduce to or\n");}
+   | exp DOT term                                {printf("reduce to dot\n");}
+   | exp COMMA term                              {printf("reduce to comma\n");}
+   | exp PLUS PLUS                               {printf("reduce to assign++\n");}
+   | exp MINUS MINUS                             {printf("reduce to assign--\n");}
+   | exp LEFT_PARENTHESIS RIGHT_PARENTHESIS      {printf("reduce to exp()\n");}
+   | exp LEFT_PARENTHESIS exp RIGHT_PARENTHESIS  {printf("reduce to exp(exp)\n");}
+   | LEFT_PARENTHESIS exp RIGHT_PARENTHESIS      {printf("reduce to (exp)\n");}
+  //  | exp ASSIGN exp                               {printf("reduce to id = exp\n");}
    ;
 
-/* proc: term LEFT_PARENTHESIS RIGHT_PARENTHESIS                  {}
-    | term LEFT_PARENTHESIS exp RIGHT_PARENTHESIS              {}
-    ; */
-
-types: type              {}
-     | type array_ops        {}
+types: type              {printf("reduce to type\n");}
+     | type array_ops    {printf("reduce to type[]\n");}
      ;
 
-type: INTEGER    {}
-    | CHAR       {}
-    | STRING     {}
-    | FLOAT      {}
-    | BOOLEAN    {}
+type: INTEGER    {printf("reduce to int\n");}
+    | CHAR       {printf("reduce to char\n");}
+    | STRING     {printf("reduce to string\n");}
+    | FLOAT      {printf("reduce to float\n");}
+    | BOOLEAN    {printf("reduce to bool\n");}
     ;
 
-numeral: NUMBER             {}
-       | FLOAT_NUMBER       {}
+numeral: NUMBER             {printf("reduce to number\n");}
+       | FLOAT_NUMBER       {printf("reduce to float_number\n");}
        ;
 
-bool: TRUE  {}
-    | FALSE {}
+bool: TRUE  {printf("reduce to true\n");}
+    | FALSE {printf("reduce to false\n");}
     ;
 
-array_ops: array_op            {}
-         | array_ops array_op  {}
+array_ops: array_op            {printf("reduce to array_op\n");}
+         | array_ops array_op  {printf("reduce to array_ops\n");}
          ;
 
-array_op: LEFT_BRACKET RIGHT_BRACKET        {}
-        | LEFT_BRACKET exp RIGHT_BRACKET    {}
+array_op: LEFT_BRACKET RIGHT_BRACKET        {printf("reduce to []\n");}
+        | LEFT_BRACKET exp RIGHT_BRACKET    {printf("reduce to [exp]\n");}
         ;
 
-term: ID                     {}
-    | ID array_ops           {}
-    | numeral                {}
-    | CHAR_VAL               {}
-    | STRING_VAL             {}
-    | bool                   {}
-    | cast                   {}
+
+term: ids                    {printf("reduce to id\n");}
+    | array_ops              {printf("reduce to array_ops\n");}
+    | numeral                {printf("reduce to numeral\n");}
+    | CHAR_VAL               {printf("reduce to charval\n");}
+    | STRING_VAL             {printf("reduce to stringval\n");}
+    | bool                   {printf("reduce to boolean\n");}
+    | cast                   {printf("reduce to cast\n");}
     ;
+
 
 %%
 
-int main (void) {
-  return yyparse();
-}
+// int parse () {
+  // return yyparse();
+// }
 
 int yyerror (char *msg) {
   fprintf (stderr, "%d: %s at '%s' in col %d\n", yylineno, msg, yytext, yycolno);
