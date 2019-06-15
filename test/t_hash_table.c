@@ -14,7 +14,7 @@ void test_purge();
 void test_destroy();
 
 int main(){
-    fprintf(stderr, "[INFO] - Start hash table test.");
+    fprintf(stderr, "[INFO] - Start hash table test.\n");
     #ifdef DEBUG
         debug = stderr;
         fprintf(debug, "[TEST] - Starting hash test\n");
@@ -44,7 +44,7 @@ int main(){
         fprintf(debug, "[TEST] - End of purge method test\n");
         // fprintf(debug, "[TEST] - Starting insert method test\n");
     #endif
-    fprintf(stderr, "[INFO] - End of hash table test.");
+    fprintf(stderr, "[INFO] - End of hash table test.\n");
     return 0;
 }
 
@@ -71,7 +71,7 @@ void test_create_hash_table(){
 
 void test_insert(){
     hash_table* ht = create_ht(10);
-    node n1;
+    ht_node n1;
     n1.key = "foo";
     var_info* inf = malloc(sizeof(var_info));
     inf->type = "bar";
@@ -80,7 +80,7 @@ void test_insert(){
         fprintf(debug,"[INFO] - Insertion of the first element\n");
     #endif
     assert(ht->insert(ht, &n1));
-    node n2;
+    ht_node n2;
     n2.key = "bar";
     inf = malloc(sizeof(var_info));
     inf->type = "foo";
@@ -89,7 +89,7 @@ void test_insert(){
         fprintf(debug,"[INFO] - Insertion of the second element\n");
     #endif
     assert(ht->insert(ht, &n2));
-    node n3;
+    ht_node n3;
     n3.key = "foo";
     inf = malloc(sizeof(var_info));
     inf->type = "bar2";
@@ -106,19 +106,19 @@ void test_insert(){
 
 void test_get(){
     hash_table* ht = create_ht(10);
-    node n1;
+    ht_node n1;
     n1.key = "foo";
     var_info* inf = malloc(sizeof(var_info));
     inf->type = "bar";
     n1.value.var = inf;
     assert(ht->insert(ht, &n1));
-    node n2;
+    ht_node n2;
     n2.key = "bar";
     inf = malloc(sizeof(var_info));
     inf->type = "foo";
     n2.value.var = inf;
     ht->insert(ht, &n2);
-    node n3;
+    ht_node n3;
     n3.key = "foo2";
     inf = malloc(sizeof(var_info));
     inf->type = "bar2";
@@ -158,19 +158,19 @@ void test_get(){
 
 void test_purge(){
     hash_table* ht = create_ht(10);
-    node n1;
+    ht_node n1;
     n1.key = "foo";
     var_info* inf = malloc(sizeof(var_info));
     inf->type = "bar";
     n1.value.var = inf;
     ht->insert(ht, &n1);
-    node n2;
+    ht_node n2;
     n2.key = "bar";
     inf = malloc(sizeof(var_info));
     inf->type = "foo";
     n2.value.var = inf;
     ht->insert(ht, &n2);
-    node n3;
+    ht_node n3;
     n3.key = "foo2";
     inf = malloc(sizeof(var_info));
     inf->type = "bar2";

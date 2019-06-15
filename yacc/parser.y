@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "stack.h"
+#include "hash_table.h"
 
 typedef struct node
 {
