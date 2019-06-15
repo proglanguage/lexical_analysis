@@ -7,7 +7,7 @@ Lexical and Syntactical Analysis for our new language to be named afterwords
 + [Flex](https://www.gnu.org/software/flex/)
 + [Bison](https://www.gnu.org/software/bison/)
 + [GNUMake](http://gnu.org/software/make)
-* [Valgrind](http://www.valgrind.org/)
++ [Valgrind](http://www.valgrind.org/)
 + [ld](https://linux.die.net/man/1/ld)
 
 ## Compiling & Using It
