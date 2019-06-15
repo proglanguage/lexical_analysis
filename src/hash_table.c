@@ -19,7 +19,7 @@ hash_table* create_ht(int size){
     }
     int i;
     for(i = 0; i < val->size; i++){
-        val->items[i] = create_ll(sizeof(node*));
+        val->items[i] = create_ll(sizeof(ht_node*));
         if (val->items[i] == NULL) {
             fprintf(stderr, "[ERROR] - Check malloc function");
         }
@@ -65,7 +65,7 @@ int _hash(char* value){
 /*!
  * @return 1 if insertion is suceeded or 0 if item is already inserted
  */
-int ht_insert(hash_table* ht, node* value){
+int ht_insert(hash_table* ht, ht_node* value){
     int pos = ht->hash(value->key)%ht->size;
     #ifdef DEBUG
         fprintf(stderr,"[INFO] - getting items at column %d on table\n", pos);
@@ -87,7 +87,7 @@ int ht_insert(hash_table* ht, node* value){
         fprintf(stderr,"[INFO] - Startup lookup for key %s\n", value->key);
     #endif
     for(i = 0; i < ll->size; i++){
-        node* n = (node*) current->value;
+        ht_node* n = (ht_node*) current->value;
         #ifdef DEBUG
             fprintf(stderr,"[INFO] - Verifying equality of %s and %s\n", value->key, n->key);
         #endif
@@ -106,7 +106,7 @@ int ht_insert(hash_table* ht, node* value){
     return 1;
 }
 
-node* ht_get(hash_table* ht, char* key){
+ht_node* ht_get(hash_table* ht, char* key){
     int pos = ht->hash(key)%ht->size;
     #ifdef DEBUG
         fprintf(stderr,"[INFO] - getting items at column %d on table\n", pos);
@@ -127,7 +127,7 @@ node* ht_get(hash_table* ht, char* key){
         fprintf(stderr,"[INFO] - Startup lookup for key %s\n", key);
     #endif
     for(i = 0; i < ll->size; i++){
-        node* n = (node*) current->value;
+        ht_node* n = (ht_node*) current->value;
         #ifdef DEBUG
             fprintf(stderr,"[INFO] - Verifying equality of %s and %s\n", key, n->key);
         #endif
@@ -145,7 +145,7 @@ node* ht_get(hash_table* ht, char* key){
     return NULL;
 }
 
-node* ht_purge(hash_table* ht, char* key){
+ht_node* ht_purge(hash_table* ht, char* key){
     list* ll = (list*) ht->items[ht->hash(key)%ht->size];
     if (ll == NULL || ll->is_empty(ll)) {
         #ifdef DEBUG
@@ -153,18 +153,18 @@ node* ht_purge(hash_table* ht, char* key){
         #endif
         return NULL;
     }
-    if (ll->size == 1 && strcmp(key,((node*) ll->head->value)->key) == 0){
+    if (ll->size == 1 && strcmp(key,((ht_node*) ll->head->value)->key) == 0){
         #ifdef DEBUG
             fprintf(stderr,"[INFO] - Removing %s in index %d\n", key, 0);
         #endif
-        return (node*) ll->remove(ll, 0);
+        return (ht_node*) ll->remove(ll, 0);
     }
     int i = 0;
     #ifdef DEBUG
         fprintf(stderr,"[INFO] - Start search\n");
     #endif
     cell_list* tmp = ll->head;
-    while(tmp != NULL && strcmp(key,((node*) tmp->value)->key)){
+    while(tmp != NULL && strcmp(key,((ht_node*) tmp->value)->key)){
         tmp = tmp->next;
         i++;
     }
@@ -172,7 +172,7 @@ node* ht_purge(hash_table* ht, char* key){
         #ifdef DEBUG
             fprintf(stderr,"[INFO] - Removing %s in index %d\n", key, i);
         #endif
-        node *val = ll->remove(ll,i);
+        ht_node *val = (ht_node*) ll->remove(ll,i);
         return val;
     }
     #ifdef DEBUG
