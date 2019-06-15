@@ -5,15 +5,15 @@
 #include <stdlib.h>
 #define LISTEND -1
 
-typedef struct _cell_list
+typedef struct cell_list
 {
-    struct _cell_list* prev;
-    struct _cell_list* next;
+    struct cell_list* prev;
+    struct cell_list* next;
     void* value;
 }cell_list;
 
 
-typedef struct _list
+typedef struct list
 {
     // int capacity;
     int t_size;
@@ -22,11 +22,11 @@ typedef struct _list
     cell_list* tail;
 
     /** Methods **/
-    int (*push)(struct _list*, void*);
-    void* (*get)(struct _list*, int);
-    void* (*remove)(struct _list*, int);
-    int (*clean)(struct _list*);
-    int (*is_empty)(struct _list*);
+    int (*push)(struct list*, void*);
+    void* (*get)(struct list*, int);
+    void* (*remove)(struct list*, int);
+    int (*clean)(struct list*);
+    int (*is_empty)(struct list*);
 }list;
 
 list* create_ll(int t_size);

@@ -1,6 +1,10 @@
 # Lexical Analysis
 
-Lexical and Syntactical Analysis for our new language to be named afterwords
+Grace compiller for Hop Language
+
+## Introduction
+
+This project aims the construction of a language wich has as main goal to help IT students that are starting in programming. We build this syntax with a vision of simplicity and facilities for the fresh programming student.
 
 ## Requirements
 

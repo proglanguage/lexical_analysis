@@ -36,7 +36,7 @@ ${OBJDIR}/%.o: $(SRCDIR)/%.c
 lexer: ${LEXDIR}/*.l
 	lex --yylineno -o $(SRCDIR)/lex.yy.c $<
 
-bison: ${YACCDIR}/*.y
+yacc: ${YACCDIR}/*.y
 	yacc $< --defines=${INCLUDEDIR}/y.tab.h --graph=${GDIR}/y.dot --report-file=${YOUTDIR}/y.output -v --output=${SRCDIR}/y.tab.c
 
 test: $(TESTS) 

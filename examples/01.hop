@@ -1,4 +1,4 @@
-# comentário
+# Comment can be making using a # caracter and goes until the line ends
 
 float x = 1.2345
 float y = 0x2f

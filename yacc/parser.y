@@ -5,13 +5,13 @@
 #include "stack.h"
 #include "hash_table.h"
 
-typedef struct node
-{
-  struct node *left;
-  struct node *right;
-  int tokcode;
-  char *token;
-} node;
+// typedef struct node
+// {
+//   struct node *left;
+//   struct node *right;
+//   int tokcode;
+//   char *token;
+// } node;
 
 /*******************************
   #define YYSTYPE struct node *
@@ -23,9 +23,9 @@ extern int yylineno;
 extern char * yytext;
 extern int yycolno;
 
-node *mknode(node *left, node *right, int tokcode, char *token);
-void printtree(node *tree);
-void generate(node *tree);
+// node *mknode(node *left, node *right, int tokcode, char *token);
+// void printtree(node *tree);
+// void generate(node *tree);
 
 %}
 
@@ -34,7 +34,7 @@ void generate(node *tree);
   float  fValue;  /* float value */
   char   cValue;  /* char value */
   char * sValue;  /* string value */
-  struct node * npValue;  /* node pointer value */
+  struct ht_node * npValue;  /* node pointer value */
   };
 
 %token <sValue> ID
@@ -94,7 +94,6 @@ stmts: stmt                 {printf("reduce to statement rule 1\n");}
 stmt:                 {printf("reduce to stmt vazio\n");}
     | declare         {printf("reduce to declare\n");}
     | structs         {printf("reduce to structs\n");}
-    // | assign         {printf("reduce to assign\n");}
     | exp             {printf("reduce to exp\n");}
     | BREAK           {printf("reduce to break\n");}
     | EXIT NUMBER     {printf("reduce to exit\n");}
@@ -141,14 +140,10 @@ forcond: ID IN exp ENDL                                           {printf("reduc
 cast: LEFT_PARENTHESIS types RIGHT_PARENTHESIS             {printf("reduce to cast\n");}
     ;
 
-// assign: ids ASSIGN exps             {printf("reduce to multiple assignment\n");}
-//       ;
-
 ids: id                      {printf("reduce to id\n");}
    | ids id                  {printf("reduce to ids");}
    | ids COMMA id            {printf("reduce to ids\n");}
    | ids DOT id              {printf("reduce to ids\n");}
-  //  | ids COMMA ID array_ops  {printf("reduce to arrays\n");}
    ;
 
 id: ID                      {printf("reduce to id\n");}
@@ -169,7 +164,6 @@ param: types ID                          {printf("reduce to param\n");}
      ;
 
 exps: exp              {printf("reduce to exp\n");}
-    // | LEFT_PARENTHESIS exp RIGHT_PARENTHESIS  {printf("reduce to exp(exp)\n");}
     | exps exp         {printf("reduce to exps\n");}
     ;
 
@@ -195,7 +189,6 @@ exp: term                                        {printf("reduce to term\n");}
    | exp LEFT_PARENTHESIS RIGHT_PARENTHESIS      {printf("reduce to exp()\n");}
    | exp LEFT_PARENTHESIS exp RIGHT_PARENTHESIS  {printf("reduce to exp(exp)\n");}
    | LEFT_PARENTHESIS exp RIGHT_PARENTHESIS      {printf("reduce to (exp)\n");}
-  //  | exp ASSIGN exp                               {printf("reduce to id = exp\n");}
    ;
 
 types: type              {printf("reduce to type\n");}
@@ -247,100 +240,100 @@ int yyerror (char *msg) {
   return 0;
 }
 
-node *mknode(node *left, node *right, int tokcode, char *token)
-{
-  /* malloc the node */
-  node *newnode = (node *) malloc(sizeof(node));
-  char *newstr = (char *) malloc(strlen(token)+1);
-  strcpy(newstr, token);
-  newnode->left = left;
-  newnode->right = right;
-  newnode->tokcode = tokcode;
-  newnode->token = newstr;
-  return(newnode);
-}
+// node *mknode(node *left, node *right, int tokcode, char *token)
+// {
+//   /* malloc the node */
+//   node *newnode = (node *) malloc(sizeof(node));
+//   char *newstr = (char *) malloc(strlen(token)+1);
+//   strcpy(newstr, token);
+//   newnode->left = left;
+//   newnode->right = right;
+//   newnode->tokcode = tokcode;
+//   newnode->token = newstr;
+//   return(newnode);
+// }
 
-void printtree(node *tree)
-{
-  if (tree == (node *) 0)
-    return;
+// void printtree(node *tree)
+// {
+//   if (tree == (node *) 0)
+//     return;
 
-  if (tree->left || tree->right)
-    printf("(");
+//   if (tree->left || tree->right)
+//     printf("(");
 
-  printf(" %s ", tree->token);
+//   printf(" %s ", tree->token);
 
-  if (tree->left)
-    printtree(tree->left);
-  if (tree->right)
-    printtree(tree->right);
+//   if (tree->left)
+//     printtree(tree->left);
+//   if (tree->right)
+//     printtree(tree->right);
 
-  if (tree->left || tree->right)
-    printf(")");
-}
+//   if (tree->left || tree->right)
+//     printf(")");
+// }
 
-void generate(node *tree)
-{
-  int i;
+// void generate(node *tree)
+// {
+//   int i;
 
-  /* generate the code for the left side */
-  if (tree->left)
-    generate(tree->left);
-  /* generate the code for the right side */
-  if (tree->right)
-    generate(tree->right);
+//   /* generate the code for the left side */
+//   if (tree->left)
+//     generate(tree->left);
+//   /* generate the code for the right side */
+//   if (tree->right)
+//     generate(tree->right);
 
-  /* generate code for this node */
+//   /* generate code for this node */
 
-  switch(tree->tokcode)
-  {
-  case 0:
-    /* we need no code for this node */
-    break;
+//   switch(tree->tokcode)
+//   {
+//   case 0:
+//     /* we need no code for this node */
+//     break;
 
-  case ID:
-    /* push the number onto the stack */
-    printf("PUSH %s\n", tree->token);
-    break;
+//   case ID:
+//     /* push the number onto the stack */
+//     printf("PUSH %s\n", tree->token);
+//     break;
 
-  case NUMBER:
-    /* push the number onto the stack */
-    printf("PUSH %s\n", tree->token);
-    break;
+//   case NUMBER:
+//     /* push the number onto the stack */
+//     printf("PUSH %s\n", tree->token);
+//     break;
 
-  case CHAR_VAL:
-    /* push the number onto the stack */
-    printf("PUSH %s\n", tree->token);
-    break;
+//   case CHAR_VAL:
+//     /* push the number onto the stack */
+//     printf("PUSH %s\n", tree->token);
+//     break;
 
-  case STRING_VAL:
-    /* push the number onto the stack */
-    printf("PUSH %s\n", tree->token);
-    break;
+//   case STRING_VAL:
+//     /* push the number onto the stack */
+//     printf("PUSH %s\n", tree->token);
+//     break;
 
-  case PLUS:
-    printf("POP A\n");
-    printf("POP B\n");
-    printf("ADD A= A+B\n");
-    printf("PUSH A\n");
-    break;
+//   case PLUS:
+//     printf("POP A\n");
+//     printf("POP B\n");
+//     printf("ADD A= A+B\n");
+//     printf("PUSH A\n");
+//     break;
 
-  case MINUS:
-    printf("POP A\n");
-    printf("POP B\n");
-    printf("SUB A= A-B\n");
-    printf("PUSH A\n");
-    break;
+//   case MINUS:
+//     printf("POP A\n");
+//     printf("POP B\n");
+//     printf("SUB A= A-B\n");
+//     printf("PUSH A\n");
+//     break;
 
-  case TIMES:
-    printf("POP A\n");
-    printf("POP B\n");
-    printf("MULT A= A*B\n");
-    printf("PUSH A\n");
-    break;
+//   case TIMES:
+//     printf("POP A\n");
+//     printf("POP B\n");
+//     printf("MULT A= A*B\n");
+//     printf("PUSH A\n");
+//     break;
 
-  default:
-    printf("error unkown AST code %d\n", tree->tokcode);
-  }
+//   default:
+//     printf("error unkown AST code %d\n", tree->tokcode);
+//   }
 
-}
+// }

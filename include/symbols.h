@@ -4,15 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct _var_info{
+typedef struct var_info{
     char* type; ///> The type of the function
 }var_info;
 
-typedef struct _proc_info{
+typedef struct proc_info{
     var_info* params; ///> Vector of var_info
 }proc_info;
 
-typedef struct _func_info{
+typedef struct func_info{
     char* return_type; ///> The type id of the return
     var_info* params; ///> Vector of var_info
 }func_info;
