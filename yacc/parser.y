@@ -84,7 +84,10 @@ void generate(node *tree);
 %start stmts
 
  /* %left INTEGER CHAR STRING */
- /*%type <npValue> stms stm exp term block type ids array_op params param declare // comment */
+%right '='
+%left '+' '-'
+%left '*' '/' '%'
+%type <npValue> stmts exp term type ids array_op params param declare
 
 %%
 
