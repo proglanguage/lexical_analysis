@@ -236,8 +236,6 @@ term: ids                    {printf("reduce to id\n");}
     | STRING_VAL             {printf("reduce to stringval\n");}
     | bool                   {printf("reduce to boolean\n");}
     | cast                   {printf("reduce to cast\n");}
-    | AMPERSAND term         {printf("reduce to &(term)\n");}
-    | TIMES term             {printf("reduce to *(term)\n");}
     ;
 
 

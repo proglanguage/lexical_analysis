@@ -10,7 +10,6 @@
 ","                       {yycolno++;printf("COMMA ");return(COMMA);}
 "."                       {yycolno++;printf("DOT ");return(DOT);}
 ":"                       {yycolno++;printf("SEMICOLON ");return(SEMICOLON);}
-"&"                       {yycolno++;printf("AMPERSAND ");return(AMPERSAND);}
 [\r\n;]                   {yycolno=0;printf("ENDL\n");return(ENDL);}
 "+"                       {yycolno++;printf("PLUS ");return(PLUS);}
 "-"                       {yycolno++;printf("MINUS ");return(MINUS);}
