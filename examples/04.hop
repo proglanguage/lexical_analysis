@@ -55,7 +55,7 @@ bool function equals(rational_t r1, rational_t r2)
   r1_reduced = simplify(r1)
   r2_reduced = simplify(r2)
 
-  return r1_reduced.numerador == r2_reduced.numerador && r1_reduced.denominador == r2_reduced.denominador
+  return r1_reduced.numerador == r2_reduced.numerador and r1_reduced.denominador == r2_reduced.denominador
 end_function
 
 rational_t function sum(rational_t r1, rational_t r2)

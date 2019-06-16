@@ -54,6 +54,7 @@ void generate(node *tree);
 %token LEFT_KEY RIGHT_KEY
 %token COMMA
 %token DOT
+%token AMPERSAND
 %token ENDL
 %token INDENT
 %token EXIT
@@ -164,7 +165,7 @@ params:                                                {}
       | params COMMA param                             {printf("reduce to params\n");}
       ;
 
-param: types ID                          {printf("reduce to param\n");}
+param: types id                          {printf("reduce to param\n");}
      | id id                             {printf("reduce to param\n");}
      ;
 
@@ -174,20 +175,20 @@ exps: exp              {printf("reduce to exp\n");}
     ;
 
 exp: term                                        {printf("reduce to term\n");}
-   | exp PLUS exp                               {printf("reduce to adition\n");}
-   | exp TIMES exp                              {printf("reduce to multiplication\n");}
-   | exp DIVIDE exp                             {printf("reduce to division\n");}
-   | exp MINUS exp                              {printf("reduce to subtraction\n");}
-   | exp POWER exp                              {printf("reduce to power\n");}
-   | exp LESS exp                               {printf("reduce to less\n");}
-   | exp LESS_EQ exp                            {printf("reduce to less equal\n");}
-   | exp BIG exp                                {printf("reduce to big\n");}
-   | exp BIG_EQ exp                             {printf("reduce to big equal\n");}
-   | exp EQ exp                                 {printf("reduce to equal\n");}
-   | exp NEQ exp                                {printf("reduce to not equal\n");}
+   | exp PLUS exp                                {printf("reduce to adition\n");}
+   | exp TIMES exp                               {printf("reduce to multiplication\n");}
+   | exp DIVIDE exp                              {printf("reduce to division\n");}
+   | exp MINUS exp                               {printf("reduce to subtraction\n");}
+   | exp POWER exp                               {printf("reduce to power\n");}
+   | exp LESS exp                                {printf("reduce to less\n");}
+   | exp LESS_EQ exp                             {printf("reduce to less equal\n");}
+   | exp BIG exp                                 {printf("reduce to big\n");}
+   | exp BIG_EQ exp                              {printf("reduce to big equal\n");}
+   | exp EQ exp                                  {printf("reduce to equal\n");}
+   | exp NEQ exp                                 {printf("reduce to not equal\n");}
    | NEG exp                                     {printf("reduce to negate\n");}
-   | exp AND exp                                {printf("reduce to and\n");}
-   | exp OR exp                                 {printf("reduce to or\n");}
+   | exp AND exp                                 {printf("reduce to and\n");}
+   | exp OR exp                                  {printf("reduce to or\n");}
    | exp DOT term                                {printf("reduce to dot\n");}
    | exp COMMA term                              {printf("reduce to comma\n");}
    | exp PLUS PLUS                               {printf("reduce to assign++\n");}
@@ -235,6 +236,8 @@ term: ids                    {printf("reduce to id\n");}
     | STRING_VAL             {printf("reduce to stringval\n");}
     | bool                   {printf("reduce to boolean\n");}
     | cast                   {printf("reduce to cast\n");}
+    | AMPERSAND term         {printf("reduce to &(term)\n");}
+    | TIMES term             {printf("reduce to *(term)\n");}
     ;
 
 

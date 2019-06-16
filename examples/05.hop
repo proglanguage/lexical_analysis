@@ -1,0 +1,18 @@
+procedure mdc(int a, int b, int *r)
+  if a == b then
+    *r = b
+  end_if
+
+  *r = mdc(b % a, a, r)
+end_procedure
+
+int result;
+
+puts("Enter the first number:")
+int n = (int) gets()
+
+puts("Enter the second number:")
+int m = (int) gets()
+
+mdc(n, m, &result)
+puts("MDC: %d", result)
