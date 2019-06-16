@@ -174,20 +174,20 @@ exps: exp              {printf("reduce to exp\n");}
     ;
 
 exp: term                                        {printf("reduce to term\n");}
-   | exp PLUS term                               {printf("reduce to adition\n");}
-   | exp TIMES term                              {printf("reduce to multiplication\n");}
-   | exp DIVIDE term                             {printf("reduce to division\n");}
-   | exp MINUS term                              {printf("reduce to subtraction\n");}
-   | exp POWER term                              {printf("reduce to power\n");}
-   | exp LESS term                               {printf("reduce to less\n");}
-   | exp LESS_EQ term                            {printf("reduce to less equal\n");}
-   | exp BIG term                                {printf("reduce to big\n");}
-   | exp BIG_EQ term                             {printf("reduce to big equal\n");}
-   | exp EQ term                                 {printf("reduce to equal\n");}
-   | exp NEQ term                                {printf("reduce to not equal\n");}
+   | exp PLUS exp                               {printf("reduce to adition\n");}
+   | exp TIMES exp                              {printf("reduce to multiplication\n");}
+   | exp DIVIDE exp                             {printf("reduce to division\n");}
+   | exp MINUS exp                              {printf("reduce to subtraction\n");}
+   | exp POWER exp                              {printf("reduce to power\n");}
+   | exp LESS exp                               {printf("reduce to less\n");}
+   | exp LESS_EQ exp                            {printf("reduce to less equal\n");}
+   | exp BIG exp                                {printf("reduce to big\n");}
+   | exp BIG_EQ exp                             {printf("reduce to big equal\n");}
+   | exp EQ exp                                 {printf("reduce to equal\n");}
+   | exp NEQ exp                                {printf("reduce to not equal\n");}
    | NEG exp                                     {printf("reduce to negate\n");}
-   | exp AND term                                {printf("reduce to and\n");}
-   | exp OR term                                 {printf("reduce to or\n");}
+   | exp AND exp                                {printf("reduce to and\n");}
+   | exp OR exp                                 {printf("reduce to or\n");}
    | exp DOT term                                {printf("reduce to dot\n");}
    | exp COMMA term                              {printf("reduce to comma\n");}
    | exp PLUS PLUS                               {printf("reduce to assign++\n");}
@@ -211,6 +211,8 @@ type: INTEGER    {printf("reduce to int\n");}
 
 numeral: NUMBER             {printf("reduce to number\n");}
        | FLOAT_NUMBER       {printf("reduce to float_number\n");}
+       | MINUS NUMBER       {printf("reduce to negative number\n");}
+       | MINUS FLOAT_NUMBER {printf("reduce to negative float number\n");}
        ;
 
 bool: TRUE  {printf("reduce to true\n");}

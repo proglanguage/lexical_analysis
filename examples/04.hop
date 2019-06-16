@@ -1,0 +1,155 @@
+rational_t : struct {
+  int numerador
+  int denominador
+}
+
+rational_t function make_rational(int numerador, int denominador)
+  rational_t result
+  result.numerador = numerador
+  result.denominador = denominador
+  return result
+end_function
+
+procedure print_rational(rational_t r1)
+  puts("%d / %d", r1.numerador, r1.denominador)
+end_procedure
+
+# api private
+int function gcd(int a, int b)
+  if a == b then
+    return b
+  end_if
+
+  return gcd(b % a, a)
+end_function
+
+rational_t function negate(rational_t r1)
+  rational_t result
+
+  result.numerador = r1.numerador * -1
+  result.denominador = r1.denominador
+
+  return result
+end_function
+
+rational_t function invert(rational_t r1)
+  rational_t result
+
+  result.numerador = r1.denominador
+  result.denominador = r1.numerador
+
+  result result
+end_function
+
+rational_t function simplify(rational_t r1)
+  rational_t result
+
+  int common_factor = gcd(r1.numerador, r1.denominador)
+  result.numerador = r1.numerador / common_factor
+  result.denominador = r1.denominador / common_factor
+
+  return result
+end_function
+
+bool function equals(rational_t r1, rational_t r2)
+  r1_reduced = simplify(r1)
+  r2_reduced = simplify(r2)
+
+  return r1_reduced.numerador == r2_reduced.numerador && r1_reduced.denominador == r2_reduced.denominador
+end_function
+
+rational_t function sum(rational_t r1, rational_t r2)
+  rational_t result
+
+  result.denominador = (r1.denominador * r2.denominador) / gcd(r1.denominador, r2.denominador)
+  result.numerador = (r1.numerador * (result.denominador / r1.denominador)) + (r2.numerador * (result.denominador / r2.denominador))
+
+  return simplify(result)
+end_function
+
+rational_t function minus(rational_t r1, rational_t r2)
+  rational_t result
+
+  result.denominador = (r1.denominador * r2.denominador) / gcd(r1.denominador, r2.denominador)
+  result.numerador = (r1.numerador * (result.denominador / r1.denominador)) - (r2.numerador * (result.denominador / r2.denominador))
+
+  return simplify(result)
+end_function
+
+rational_t function multiply(rational_t r1, rational_t r2)
+  rational_t result
+
+  result.numerador = r1.numerador * r2.numerador
+  result.denominador = r1.denominador * r2.denominador
+
+  return simplify(result)
+end_function
+
+rational_t function divide(rational_t r1, rational_t r2)
+  return simplify(multiply(r1, invert(r2)))
+end_function
+
+# Begin main
+
+puts("Numerador da primeira fração:")
+int n1 = (int) gets()
+
+puts("Denominador da primeira fração:")
+int n2 = (int) gets()
+
+puts("Numerador da segunda fração:")
+int n3 = (int) gets()
+
+puts("Denominador da segunda fração:")
+int n4 = (int) gets()
+
+rational_t r1, r2
+r1.numerador = n1
+r1.denominador = n2
+r2.numerador = n3
+r2.denominador = n4
+
+print_rational(r1)
+print_rational(r2)
+
+puts("Reduzidos:")
+print_rational(simplify(r1))
+print_rational(simplify(r2))
+
+puts("Inversos:")
+print_rational(invert(r1))
+print_rational(invert(r2))
+
+puts("Soma:")
+print_rational(r1)
+puts(" + ")
+print_rational(r2)
+puts(" = ")
+print_rational(sum(r1, r2))
+
+puts("Subtração:")
+print_rational(r1)
+puts(" + ")
+print_rational(r2)
+puts(" = ")
+print_rational(sum(r1, r2))
+
+puts("Multiplicação:")
+print_rational(r1)
+puts(" + ")
+print_rational(r2)
+puts(" = ")
+print_rational(multiply(r1, r2))
+
+puts("Divisão:")
+print_rational(r1)
+puts(" + ")
+print_rational(r2)
+puts(" = ")
+print_rational(divide(r1, r2))
+
+if equals(r1, r2) then
+  puts("As frações são equivalentes.")
+else
+  puts("As frações não são equivalentes.")
+end_if
