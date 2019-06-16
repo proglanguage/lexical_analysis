@@ -9,14 +9,14 @@ TwoDimensionalMatrix function read_matrix()
   matrix.values = []
 
   puts("What is the number of lines?")
-  matrix.number_of_lines = (int) gets
+  matrix.number_of_lines = (int) gets()
   puts("What is the number of columns?")
-  matrix.number_of_columns = (int) gets
+  matrix.number_of_columns = (int) gets()
 
   for(int line = 0, line < matrix.number_of_lines, line++)
     for(int column = 0, column < matrix.number_of_columns, column++)
       puts("Value for line %d column %d:", i, j)
-      matrix.values[line][column] = (int) gets
+      matrix.values[line][column] = (int) gets()
     end_for
   end_for
 
@@ -32,7 +32,7 @@ procedure print_matrix(TwoDimensionalMatrix matrix)
 end_procedure
 
 procedure print_sum(TwoDimensionalMatrix m1, TwoDimensionalMatrix m2)
-  if m1.number_of_lines() != m2.number_of_lines() || m1.number_of_columns != m2.number_of_columns then
+  if m1.number_of_lines() != m2.number_of_lines() or m1.number_of_columns != m2.number_of_columns then
     puts("Cannot calculate sum because sizes are different.")
     return
   end_if

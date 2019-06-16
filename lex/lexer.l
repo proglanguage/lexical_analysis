@@ -16,6 +16,7 @@
 "*"                       {yycolno++;printf("TIMES ");return(TIMES);}
 "/"                       {yycolno++;printf("DIVIDE ");return(DIVIDE);}
 "^"                       {yycolno++;printf("POWER ");return(POWER);}
+"%"                       {yycolno++;printf("MODULUS ");return(MODULUS);}
 "("                       {yycolno++;printf("LEFT_PARENTHESIS ");return(LEFT_PARENTHESIS);}
 ")"                       {yycolno++;printf("RIGHT_PARENTHESIS ");return(RIGHT_PARENTHESIS);}
 "["                       {yycolno++;printf("LEFT_BRACKET ");return(LEFT_BRACKET);}
@@ -24,11 +25,11 @@
 "}"                       {yycolno++;printf("RIGHT_KEY ");return(RIGHT_KEY);}
 "<="                      {yycolno+=2;printf("LESS_EQ ");return(LESS_EQ);}
 ">="                      {yycolno+=2;printf("BIG_EQ ");return(BIG_EQ);}
+"=="                      {yycolno+=2;printf("EQ ");return(EQ);}
+"!="                      {yycolno+=2;printf("NEQ ");return(NEQ);}
 "<"                       {yycolno++;printf("LESS ");return(LESS);}
 ">"                       {yycolno++;printf("BIG ");return(BIG);}
 "="                       {yycolno++;printf("ASSIGN ");return(ASSIGN);}
-"=="                      {yycolno+=2;printf("EQ ");return(EQ);}
-"!="                      {yycolno+=2;printf("NEQ ");return(NEQ);}
 "!"                       {yycolno+=1;printf("NEG ");return(NEG);}
 "and"                     {yycolno+=3;printf("AND ");return(AND);}
 "or"                      {yycolno+=2;printf("OR ");return(OR);}
@@ -92,6 +93,8 @@
 ^[\t]                     {yycolno++;}
 
 [ ]                       {/* Ignore white spaces */yycolno++;}
+
+.                         {return *yytext;} /* Anything not defined is a syntax error */
 
 %%
 
