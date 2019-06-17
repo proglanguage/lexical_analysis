@@ -5,7 +5,7 @@
 #include "stack.h"
 #include "hash_table.h"
 
-int yydebug=0;
+int yydebug=1;
 
 typedef struct node
 {
@@ -24,10 +24,12 @@ int yyerror(char *s);
 extern int yylineno;
 extern char * yytext;
 extern int yycolno;
+extern hash_table* symbols;
 
 node *mknode(node *left, node *right, int tokcode, char *token);
 void printtree(node *tree);
 void generate(node *tree);
+char *solve_exp_type(node* exp);
 
 #pragma GCC diagnostic ignored "-Wformat-zero-length"
 %}
@@ -96,8 +98,8 @@ void generate(node *tree);
 %right ASSIGN OR NEG
 %left PLUS MINUS TIMES DIVIDE POWER MODULUS AND
 %type <htnValue> declare structs
-%type <npValue> stmts stmt cond_structs exp exps for if elseif elseifs forcond cast numeral bool
-%type <sValue> types type id ids term array_op array_ops
+%type <npValue> stmts stmt cond_structs exp exps for if elseif elseifs forcond
+%type <sValue> types type id ids term array_op array_ops cast numeral bool
 %type <varInfoList> params declist
 %type <varInfo> param
 
@@ -110,13 +112,13 @@ stmts: stmt                 {(yydebug?printf("reduce to statement rule 1\n"):pri
 stmt:                 {(yydebug?printf("reduce to stmt vazio\n"):printf(""));}
     | declare         {
                         (yydebug?printf("reduce to declare\n"):printf(""));
-                        printf("%s.", $1->key);
-                        printf("%s\n", $1->value.var->type);
+                        if (symbols == NULL) { symbols = create_ht(15); }
+                        symbols->insert(symbols, $1);
                       }
     | structs         {
                         (yydebug?printf("reduce to structs\n"):printf(""));
-                        printf("%s\n", $1->key);
-                        // printf("%s\n", $1->value.var->type);
+                        if (symbols == NULL) { symbols = create_ht(15); }
+                        symbols->insert(symbols, $1);
                       }
     | cond_structs    {
                         (yydebug?printf("reduce to conditional structures\n"):printf(""));
@@ -144,9 +146,12 @@ stmt:                 {(yydebug?printf("reduce to stmt vazio\n"):printf(""));}
 structs: PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_PROCEDURE          {
                                                                                                     (yydebug?printf("reduce to procedure\n"):printf(""));
                                                                                                     proc_info * proc = malloc(sizeof(proc_info));
+                                                                                                    sprintf(proc->id,"%s",$2);
                                                                                                     proc->params = $4;
-                                                                                                    info i;
-                                                                                                    i.proc = proc;
+                                                                                                    info* i = malloc(sizeof(info));
+                                                                                                    i->var = NULL;
+                                                                                                    i->func = NULL;
+                                                                                                    i->proc = proc;
                                                                                                     ht_node * n = malloc(sizeof(ht_node));
                                                                                                     n->key = $2; n->value = i;
                                                                                                     $$=n;
@@ -154,10 +159,13 @@ structs: PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_P
        | types FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_FUNCTION      {
                                                                                                     (yydebug?printf("reduce to function\n"):printf(""));
                                                                                                     func_info * func = malloc(sizeof(func_info));
-                                                                                                    func->return_type = $1;
+                                                                                                    sprintf(func->id,"%s",$3);
+                                                                                                    sprintf(func->return_type,"%s",$1);
                                                                                                     func->params = $5;
-                                                                                                    info i;
-                                                                                                    i.func = func;
+                                                                                                    info* i = malloc(sizeof(info));
+                                                                                                    i->var = NULL;
+                                                                                                    i->func = func;
+                                                                                                    i->proc = NULL;
                                                                                                     ht_node * n = malloc(sizeof(ht_node));
                                                                                                     n->key = $3; n->value = i;
                                                                                                     $$=n;
@@ -165,10 +173,13 @@ structs: PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_P
        | ids FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_FUNCTION        {
                                                                                                     (yydebug?printf("reduce to function\n"):printf(""));
                                                                                                     func_info * func = malloc(sizeof(func_info));
-                                                                                                    func->return_type = $1;
+                                                                                                    sprintf(func->id,"%s",$3);
+                                                                                                    sprintf(func->return_type,"%s",$1);
                                                                                                     func->params = $5;
-                                                                                                    info i;
-                                                                                                    i.func = func;
+                                                                                                    info* i = malloc(sizeof(info));
+                                                                                                    i->var = NULL;
+                                                                                                    i->func = func;
+                                                                                                    i->proc = NULL;
                                                                                                     ht_node * n = malloc(sizeof(ht_node));
                                                                                                     n->key = $3; n->value = i;
                                                                                                     $$=n;
@@ -176,10 +187,13 @@ structs: PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_P
        | ID SEMICOLON STRUCT LEFT_KEY ENDL declist ENDL RIGHT_KEY                                 {
                                                                                                     (yydebug?printf("reduce to struct\n"):printf(""));
                                                                                                     func_info * func = malloc(sizeof(func_info));
-                                                                                                    func->return_type = $1;
+                                                                                                    sprintf(func->id,"%s",$1);
+                                                                                                    sprintf(func->return_type, "struct");
                                                                                                     func->params = $6;
-                                                                                                    info i;
-                                                                                                    i.func = func;
+                                                                                                    info* i = malloc(sizeof(info));
+                                                                                                    i->var = NULL;
+                                                                                                    i->func = func;
+                                                                                                    i->proc = NULL;
                                                                                                     ht_node * n = malloc(sizeof(ht_node));
                                                                                                     char * str = malloc(255);
                                                                                                     sprintf(str, "struct.%s", $1);
@@ -213,19 +227,19 @@ elseif: ELSE IF exps THEN ENDL stmts  {(yydebug?printf("reduce to else if\n"):pr
       ;
 
 else:
-    | ELSE ENDL stmts                                      {(yydebug?printf("reduce to else\n"):printf(""));}
+    | ELSE ENDL stmts     {(yydebug?printf("reduce to else\n"):printf(""));}
     ;
 
 declist: declare                {
                                   (yydebug?printf("reduce to declare on declist\n"):printf(""));
                                   list* lst = create_ll(sizeof(var_info*));
-                                  lst->push(lst, $1->value.var);
+                                  lst->push(lst, $1->value->var);
                                   $$=lst;
                                 }
        | declist ENDL declare   {
                                   (yydebug?printf("reduce to declist\n"):printf(""));
                                   list* lst = create_ll(sizeof(var_info*));
-                                  lst->push(lst, $3->value.var);
+                                  lst->push(lst, $3->value->var);
                                   $$=lst->merge($1, lst);
                                 }
        ;
@@ -276,10 +290,12 @@ id: ID                      {
 declare: types ids                  {
                                       (yydebug?printf("reduce to declare\n"):printf(""));
                                       var_info * var = malloc(sizeof(var_info));
-                                      var->id = $2;
-                                      var->type = $1;
-                                      info i;
-                                      i.var = var;
+                                      sprintf(var->id,"%s",$2);
+                                      sprintf(var->type,"%s",$1);
+                                      info* i = malloc(sizeof(info));
+                                      i->var = var;
+                                      i->func = NULL;
+                                      i->proc = NULL;
                                       ht_node * n = malloc(sizeof(ht_node));
                                       n->key = $2; n->value = i;
                                       $$=n;
@@ -287,10 +303,12 @@ declare: types ids                  {
        | id ids                     {
                                       (yydebug?printf("reduce to declare\n"):printf(""));
                                       var_info * var = malloc(sizeof(var_info));
-                                      var->id = $2;
-                                      var->type = $1;
-                                      info i;
-                                      i.var = var;
+                                      sprintf(var->id,"%s",$2);
+                                      sprintf(var->type,"%s",$1);
+                                      info* i = malloc(sizeof(info));
+                                      i->var = var;
+                                      i->func = NULL;
+                                      i->proc = NULL;
                                       ht_node * n = malloc(sizeof(ht_node));
                                       n->key = $2; n->value = i;
                                       $$=n;
@@ -298,10 +316,12 @@ declare: types ids                  {
        | types ids ASSIGN exps      {
                                       (yydebug?printf("reduce to declare with assign\n"):printf(""));
                                       var_info * var = malloc(sizeof(var_info));
-                                      var->id = $2;
-                                      var->type = $1;
-                                      info i;
-                                      i.var = var;
+                                      sprintf(var->id,"%s",$2);
+                                      sprintf(var->type,"%s",$1);
+                                      info* i = malloc(sizeof(info));
+                                      i->var = var;
+                                      i->func = NULL;
+                                      i->proc = NULL;
                                       ht_node * n = malloc(sizeof(ht_node));
                                       n->key = $2; n->value = i;
                                       $$=n;
@@ -309,10 +329,12 @@ declare: types ids                  {
        | id ids ASSIGN exps         {
                                       (yydebug?printf("reduce to declare with assign\n"):printf(""));
                                       var_info * var = malloc(sizeof(var_info));
-                                      var->id = $2;
-                                      var->type = $1;
-                                      info i;
-                                      i.var = var;
+                                      sprintf(var->id,"%s",$2);
+                                      sprintf(var->type,"%s",$1);
+                                      info* i = malloc(sizeof(info));
+                                      i->var = var;
+                                      i->func = NULL;
+                                      i->proc = NULL;
                                       ht_node * n = malloc(sizeof(ht_node));
                                       n->key = $2; n->value = i;
                                       $$=n;
@@ -341,15 +363,15 @@ params:                                                 {
 param: types id                           {
                                             (yydebug?printf("reduce to param\n"):printf(""));
                                             var_info * var = malloc(sizeof(var_info));
-                                            var->id = $2;
-                                            var->type = $1;
+                                            sprintf(var->id,"%s",$2);
+                                            sprintf(var->type,"%s",$1);
                                             $$=var;
                                           }
      | id id                              {
                                             (yydebug?printf("reduce to param\n"):printf(""));
                                             var_info * var = malloc(sizeof(var_info));
-                                            var->id = $2;
-                                            var->type = $1;
+                                            sprintf(var->id,"%s",$2);
+                                            sprintf(var->type,"%s",$1);
                                             $$=var;
                                           }
      ;
@@ -386,7 +408,9 @@ exp: term                                        {(yydebug?printf("reduce to ter
 types: type               {
                             (yydebug?printf("reduce to type\n"):printf(""));
                           }
-     | type array_ops    {(yydebug?printf("reduce to type[]\n"):printf(""));}
+     | type array_ops     {
+                            (yydebug?printf("reduce to type[]\n"):printf(""));
+                          }
      ;
 
 type: INTEGER     {
@@ -411,39 +435,116 @@ type: INTEGER     {
                   }
     ;
 
-numeral: NUMBER             {(yydebug?printf("reduce to number\n"):printf(""));}
-       | FLOAT_NUMBER       {(yydebug?printf("reduce to float_number\n"):printf(""));}
-       | MINUS NUMBER       {(yydebug?printf("reduce to negative number\n"):printf(""));}
-       | MINUS FLOAT_NUMBER {(yydebug?printf("reduce to negative float number\n"):printf(""));}
+numeral: NUMBER             {
+                              (yydebug?printf("reduce to number\n"):printf(""));
+                              char * tmp = malloc(255);
+                              sprintf(tmp,"%i",$1);
+                              $$=tmp;
+                            }
+       | FLOAT_NUMBER       {
+                              (yydebug?printf("reduce to float_number\n"):printf(""));
+                              char * tmp = malloc(255);
+                              sprintf(tmp,"%f",$1);
+                              $$=tmp;
+                            }
+       | MINUS NUMBER       {
+                              (yydebug?printf("reduce to number\n"):printf(""));
+                              char * tmp = malloc(255);
+                              sprintf(tmp,"-%i",$2);
+                              $$=tmp;
+                            }
+       | MINUS FLOAT_NUMBER {
+                              (yydebug?printf("reduce to float_number\n"):printf(""));
+                              char * tmp = malloc(255);
+                              sprintf(tmp,"-%f",$2);
+                              $$=tmp;
+                            }
        ;
 
-bool: TRUE  {(yydebug?printf("reduce to true\n"):printf(""));}
-    | FALSE {(yydebug?printf("reduce to false\n"):printf(""));}
+bool: TRUE  {
+              (yydebug?printf("reduce to true\n"):printf(""));
+              char * tmp = malloc(5);
+              sprintf(tmp,"true");
+              $$=tmp;
+            }
+    | FALSE {
+              (yydebug?printf("reduce to false\n"):printf(""));
+              char * tmp = malloc(6);
+              sprintf(tmp,"false");
+              $$=tmp;
+            }
     ;
 
-array_ops: array_op            {(yydebug?printf("reduce to array_op\n"):printf(""));}
-         | array_ops array_op  {(yydebug?printf("reduce to array_ops\n"):printf(""));}
+array_ops: array_op             {
+                                  (yydebug?printf("reduce to array_op\n"):printf(""));
+                                  $$=$1;
+                                }
+         | array_ops array_op   {
+                                  (yydebug?printf("reduce to array_ops\n"):printf(""));
+                                  char* tmp = malloc(255);
+                                  sprintf(tmp,"%s%s", $1, $2);
+                                  $$=tmp;
+                                }
          ;
 
-array_op: LEFT_BRACKET RIGHT_BRACKET        {(yydebug?printf("reduce to []\n"):printf(""));}
-        | LEFT_BRACKET exp RIGHT_BRACKET    {(yydebug?printf("reduce to [exp]\n"):printf(""));}
+array_op: LEFT_BRACKET RIGHT_BRACKET        {
+                                              (yydebug?printf("reduce to []\n"):printf(""));
+                                              char* tmp = malloc(255);
+                                              sprintf(tmp,"[]");
+                                              $$=tmp;
+                                            }
+        | LEFT_BRACKET exp RIGHT_BRACKET    {
+                                              (yydebug?printf("reduce to [exp]\n"):printf(""));
+                                              char* tmp = malloc(255);
+                                              sprintf(tmp,"[%s]", solve_exp_type($2));
+                                              $$=tmp;
+                                            }
         ;
 
 
-term: ids                    {(yydebug?printf("reduce to id\n"):printf(""));}
-    | array_ops              {(yydebug?printf("reduce to array_ops\n"):printf(""));}
-    | numeral                {(yydebug?printf("reduce to numeral\n"):printf(""));}
-    | CHAR_VAL               {(yydebug?printf("reduce to charval\n"):printf(""));}
-    | STRING_VAL             {(yydebug?printf("reduce to stringval\n"):printf(""));}
-    | bool                   {(yydebug?printf("reduce to boolean\n"):printf(""));}
-    | cast                   {(yydebug?printf("reduce to cast\n"):printf(""));}
+term: ids         {
+                    (yydebug?printf("reduce to id\n"):printf(""));
+                    $$=$1;
+                  }
+    | array_ops   {
+                    (yydebug?printf("reduce to array_ops\n"):printf(""));
+                    $$=$1;
+                  }
+    | numeral     {
+                    (yydebug?printf("reduce to numeral\n"):printf(""));
+                    $$=$1;
+                  }
+    | CHAR_VAL    {
+                    (yydebug?printf("reduce to charval\n"):printf(""));
+                    char * tmp = malloc(1);
+                    sprintf(tmp, "%c", $1);
+                    $$=tmp;
+                  }
+    | STRING_VAL  {
+                    (yydebug?printf("reduce to stringval\n"):printf(""));
+                    char * tmp = malloc(255);
+                    sprintf(tmp, "%s", $1);
+                    $$=tmp;
+                  }
+    | bool        {
+                    (yydebug?printf("reduce to boolean\n"):printf(""));
+                    $$=$1;
+                  }
+    | cast        {
+                    (yydebug?printf("reduce to cast\n"):printf(""));
+                    $$=$1;
+                  }
     | STDIN       {
                     (yydebug?printf("reduce to puts\n"):printf(""));
-                    $$="puts";
+                    char * tmp = malloc(5);
+                    sprintf(tmp, "puts");
+                    $$=tmp;
                   }
     | STDOUT      {
                     (yydebug?printf("reduce to gets\n"):printf(""));
-                    $$="gets";
+                    char * tmp = malloc(5);
+                    sprintf(tmp, "gets");
+                    $$=tmp;
                   }
     ;
 
@@ -555,4 +656,12 @@ void generate(node *tree)
     printf("error unkown AST code %d\n", tree->tokcode);
   }
 
+}
+
+/**
+ * Deve chamar a função de erro em caso de tipos de operandos incompatíveis
+ * Caso contrário, retorna o tipo da expressão
+ */
+char * solve_exp_type(node* exp){
+  return NULL;
 }

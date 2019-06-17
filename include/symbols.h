@@ -11,10 +11,12 @@ typedef struct var_info{
 }var_info;
 
 typedef struct proc_info{
+    char* id; ///> The alias to the variable
     list* params; ///> Vector of var_info
 }proc_info;
 
 typedef struct func_info{
+    char* id; ///> The alias to the variable
     char* return_type; ///> The type id of the return
     list* params; ///> Vector of var_info
 }func_info;

@@ -7,8 +7,8 @@
 #include "linked_list.h"
 #include "symbols.h"
 
-/*! An union type that can store variables, functions and procedures informations
- * \union info
+/*! An struct type that can store variables, functions and procedures informations
+ * \struct info
  * \typedef info
  *
  * \headerfile hash_table.h "hash_table.h"
@@ -17,11 +17,11 @@
  * \var proc
  * \var func
  */
-typedef union info {
+typedef struct info {
     var_info* var; ///< Variable informations
     proc_info* proc; ///< Procedure informations
     func_info* func; ///< Function infomations
-}info; ///< An union type that can store variables, functions and procedures informations
+}info; ///< An struct type that can store variables, functions and procedures informations
 
 /*! A structure to store code informations
  * \struct ht_node
@@ -35,7 +35,7 @@ typedef union info {
 typedef struct ht_node
 {
     char* key; ///< ht_node field that stores the key of the node
-    info value; ///< ht_node field that stores a value to the node
+    info* value; ///< ht_node field that stores a value to the node
 }ht_node; ///< \typedef ht_node A structure to store code informations
 
 /*! A struct representing a hash table
