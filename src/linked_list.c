@@ -11,16 +11,16 @@ list* create_ll(int t_size){
         return NULL;
     }
     // val->capacity = capacity;
-    #ifdef DEBUG
-        fprintf(stderr, "[INFO] - can access capacity value\n");
-    #endif
+    // #ifdef DEBUG
+    //     fprintf(stderr, "[INFO] - can access capacity value\n");
+    // #endif
     val->t_size = t_size;
     #ifdef DEBUG
-        fprintf(stderr, "[INFO] - can access t_size value\n");
+        fprintf(stderr, "[INFO] - can access t_size value (%i)\n", val->t_size);
     #endif
     val->size = 0;
     #ifdef DEBUG
-        fprintf(stderr, "[INFO] - can access size value\n");
+        fprintf(stderr, "[INFO] - can access size value (%i)\n", val->size);
     #endif
     val->head = NULL;
     #ifdef DEBUG
@@ -86,7 +86,8 @@ int push_in_ll(list* ll, void* val){
     ll->tail = item;
     ll->size++;
     #ifdef DEBUG
-        fprintf(stderr, "[INFO] - Value %i inserted\n", (*item).value);
+        // fprintf(stderr, "[INFO] - Value %s inserted\n", ((ht_node*)((*item).value))->key);
+        fprintf(stderr, "[INFO] - List size = %i\n", ll->size);
     #endif
     return 1;
 }
@@ -197,6 +198,12 @@ void* remove_from_ll(list* ll, int index){
 }
 
 list* merge_lls(list* ll1, list* ll2){
+    if (ll1 == NULL) {
+        return ll2;
+    }
+    if (ll2 == NULL) {
+        return ll1;
+    }
     if (ll1->t_size != ll2->t_size) {
         fprintf(stderr, "[ERROR] - Invalid list types");
         return NULL;

@@ -36,8 +36,6 @@
 "or"                      {yycolno+=2;(lldebug?printf("OR "):printf(""));return(OR);}
 "true"                    {yycolno+=4;(lldebug?printf("TRUE "):printf(""));return(TRUE);}
 "false"                   {yycolno+=5;(lldebug?printf("FALSE "):printf(""));return(FALSE);}
-"begin_program"           {yycolno+=13;(lldebug?printf("BEGIN_PROGRAM "):printf(""));return(BEGIN_PROGRAM);}
-"end_program"             {yycolno+=13;(lldebug?printf("END_PROGRAM "):printf(""));return(END_PROGRAM);}
 "procedure"               {yycolno+=9;(lldebug?printf("PROCEDURE "):printf(""));return(PROCEDURE);}
 "end_procedure"           {yycolno+=11;(lldebug?printf("END_PROCEDURE "):printf(""));return(END_PROCEDURE);}
 "function"                {yycolno+=8;(lldebug?printf("FUNCTION "):printf(""));return(FUNCTION);}

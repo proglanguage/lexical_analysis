@@ -12,7 +12,7 @@ YOUTDIR = youtput
 EXAMPLESDIR = examples
 
 CC = gcc
-CFLAGS = -I $(INCLUDEDIR)
+CFLAGS = -I $(INCLUDEDIR) -g
 LDFLAGS =
 
 BIN = ${BINDIR}/${APPNAME}

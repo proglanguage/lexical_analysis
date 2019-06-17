@@ -5,7 +5,7 @@
 #include "stack.h"
 #include "hash_table.h"
 
-int yydebug=1;
+int yydebug=0;
 
 typedef struct node
 {
@@ -145,9 +145,7 @@ stmt:                 {(yydebug?printf("reduce to stmt vazio\n"):printf(""));}
 
 structs: PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_PROCEDURE          {
                                                                                                     (yydebug?printf("reduce to procedure\n"):printf(""));
-                                                                                                    proc_info * proc = malloc(sizeof(proc_info));
-                                                                                                    sprintf(proc->id,"%s",$2);
-                                                                                                    proc->params = $4;
+                                                                                                    proc_info * proc = create_proc_info($2, $4);
                                                                                                     info* i = malloc(sizeof(info));
                                                                                                     i->var = NULL;
                                                                                                     i->func = NULL;
@@ -158,10 +156,7 @@ structs: PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_P
                                                                                                   }
        | types FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_FUNCTION      {
                                                                                                     (yydebug?printf("reduce to function\n"):printf(""));
-                                                                                                    func_info * func = malloc(sizeof(func_info));
-                                                                                                    sprintf(func->id,"%s",$3);
-                                                                                                    sprintf(func->return_type,"%s",$1);
-                                                                                                    func->params = $5;
+                                                                                                    func_info * func = create_func_info($1,$3,$5);
                                                                                                     info* i = malloc(sizeof(info));
                                                                                                     i->var = NULL;
                                                                                                     i->func = func;
@@ -172,10 +167,7 @@ structs: PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_P
                                                                                                   }
        | ids FUNCTION ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_FUNCTION        {
                                                                                                     (yydebug?printf("reduce to function\n"):printf(""));
-                                                                                                    func_info * func = malloc(sizeof(func_info));
-                                                                                                    sprintf(func->id,"%s",$3);
-                                                                                                    sprintf(func->return_type,"%s",$1);
-                                                                                                    func->params = $5;
+                                                                                                    func_info * func = create_func_info($1,$3,$5);
                                                                                                     info* i = malloc(sizeof(info));
                                                                                                     i->var = NULL;
                                                                                                     i->func = func;
@@ -186,10 +178,7 @@ structs: PROCEDURE ID LEFT_PARENTHESIS params RIGHT_PARENTHESIS ENDL stmts END_P
                                                                                                   }
        | ID SEMICOLON STRUCT LEFT_KEY ENDL declist ENDL RIGHT_KEY                                 {
                                                                                                     (yydebug?printf("reduce to struct\n"):printf(""));
-                                                                                                    func_info * func = malloc(sizeof(func_info));
-                                                                                                    sprintf(func->id,"%s",$1);
-                                                                                                    sprintf(func->return_type, "struct");
-                                                                                                    func->params = $6;
+                                                                                                    func_info * func = create_func_info($1,"struct",$6);
                                                                                                     info* i = malloc(sizeof(info));
                                                                                                     i->var = NULL;
                                                                                                     i->func = func;
@@ -289,9 +278,7 @@ id: ID                      {
 
 declare: types ids                  {
                                       (yydebug?printf("reduce to declare\n"):printf(""));
-                                      var_info * var = malloc(sizeof(var_info));
-                                      sprintf(var->id,"%s",$2);
-                                      sprintf(var->type,"%s",$1);
+                                      var_info * var = create_var_info($2,$1);
                                       info* i = malloc(sizeof(info));
                                       i->var = var;
                                       i->func = NULL;
@@ -302,9 +289,7 @@ declare: types ids                  {
                                     }
        | id ids                     {
                                       (yydebug?printf("reduce to declare\n"):printf(""));
-                                      var_info * var = malloc(sizeof(var_info));
-                                      sprintf(var->id,"%s",$2);
-                                      sprintf(var->type,"%s",$1);
+                                      var_info * var = create_var_info($2,$1);
                                       info* i = malloc(sizeof(info));
                                       i->var = var;
                                       i->func = NULL;
@@ -315,9 +300,7 @@ declare: types ids                  {
                                     }
        | types ids ASSIGN exps      {
                                       (yydebug?printf("reduce to declare with assign\n"):printf(""));
-                                      var_info * var = malloc(sizeof(var_info));
-                                      sprintf(var->id,"%s",$2);
-                                      sprintf(var->type,"%s",$1);
+                                      var_info * var = create_var_info($2,$1);
                                       info* i = malloc(sizeof(info));
                                       i->var = var;
                                       i->func = NULL;
@@ -328,9 +311,7 @@ declare: types ids                  {
                                     }
        | id ids ASSIGN exps         {
                                       (yydebug?printf("reduce to declare with assign\n"):printf(""));
-                                      var_info * var = malloc(sizeof(var_info));
-                                      sprintf(var->id,"%s",$2);
-                                      sprintf(var->type,"%s",$1);
+                                      var_info * var = create_var_info($2,$1);
                                       info* i = malloc(sizeof(info));
                                       i->var = var;
                                       i->func = NULL;
@@ -362,16 +343,12 @@ params:                                                 {
 
 param: types id                           {
                                             (yydebug?printf("reduce to param\n"):printf(""));
-                                            var_info * var = malloc(sizeof(var_info));
-                                            sprintf(var->id,"%s",$2);
-                                            sprintf(var->type,"%s",$1);
+                                            var_info * var = create_var_info($2,$1);
                                             $$=var;
                                           }
      | id id                              {
                                             (yydebug?printf("reduce to param\n"):printf(""));
-                                            var_info * var = malloc(sizeof(var_info));
-                                            sprintf(var->id,"%s",$2);
-                                            sprintf(var->type,"%s",$1);
+                                            var_info * var = create_var_info($2,$1);
                                             $$=var;
                                           }
      ;
