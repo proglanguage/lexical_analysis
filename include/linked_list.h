@@ -25,6 +25,7 @@ typedef struct list
     int (*push)(struct list*, void*);
     void* (*get)(struct list*, int);
     void* (*remove)(struct list*, int);
+    struct list* (*merge)(struct list* ll1, struct list* ll2);
     int (*clean)(struct list*);
     int (*is_empty)(struct list*);
 }list;
@@ -36,6 +37,8 @@ int push_in_ll(list* ll, void* val);
 void* get_from_ll(list* ll, int index);
 
 void* remove_from_ll(list* ll, int index);
+
+list* merge_lls(list* ll1, list* ll2);
 
 int clean_ll(list* ll);
 

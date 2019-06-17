@@ -62,6 +62,7 @@ y.tab.h
 */.vscode/
 
 bin/grace
+grace
 
 test/t_*
 !test/t_*.c

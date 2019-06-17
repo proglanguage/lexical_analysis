@@ -7,22 +7,6 @@
 #include "linked_list.h"
 #include "symbols.h"
 
-/*! An union type that can store variables, functions and procedures informations
- * \union info
- * \typedef info
- *
- * \headerfile hash_table.h "hash_table.h"
- * \author Ailson F. dos Santos ailsonforte@hotmail.com
- * \var var
- * \var proc
- * \var func
- */
-typedef union info {
-    var_info* var; ///< Variable informations
-    proc_info* proc; ///< Procedure informations
-    func_info* func; ///< Function infomations
-}info; ///< An union type that can store variables, functions and procedures informations
-
 /*! A structure to store code informations
  * \struct ht_node
  * \typedef ht_node
@@ -35,7 +19,7 @@ typedef union info {
 typedef struct ht_node
 {
     char* key; ///< ht_node field that stores the key of the node
-    info value; ///< ht_node field that stores a value to the node
+    info* value; ///< ht_node field that stores a value to the node
 }ht_node; ///< \typedef ht_node A structure to store code informations
 
 /*! A struct representing a hash table
@@ -61,6 +45,12 @@ typedef struct hash_table
     ht_node* (*purge)(struct hash_table*, char*); ///< Method the delete an object in the table
     int (*destroy)(struct hash_table*); ///< Method the clean the table and free the pointer
 }hash_table; ///< \typedef hash_table A struct representing a hash table
+
+///< \fn hash_table* create_ht_node(int size)
+///< A constructor for a hash table node
+///< \param size the number of colums used by the hash table
+///< \return a pointer to the new hash table
+ht_node* create_ht_node(char * key, info* info);
 
 ///< \fn hash_table* create_ht(int size)
 ///< A constructor for a hash table

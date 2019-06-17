@@ -4,6 +4,14 @@
 // #define DEBUG
 // #endif
 
+ht_node* create_ht_node(char * key, info* info){
+    ht_node* result = malloc(sizeof(ht_node));
+    result->key = malloc(strlen(key)+1);
+    strcpy(result->key, key);
+    result->value = info;
+    return result;
+}
+
 hash_table* create_ht(int size){
     hash_table* val = (hash_table*) malloc(sizeof(hash_table));
     if (val == NULL) {

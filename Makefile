@@ -9,13 +9,15 @@ OBJDIR = build
 TESTDIR = test
 GDIR = graph
 YOUTDIR = youtput
+EXAMPLESDIR = examples
 
 CC = gcc
-CFLAGS = -I $(INCLUDEDIR)
+CFLAGS = -I $(INCLUDEDIR) -g
 LDFLAGS =
 
 BIN = ${BINDIR}/${APPNAME}
 APP = $(wildcard ${APPDIR}/*.c)
+EXAMPLES = $(wildcard $(EXAMPLESDIR)/*.hop)
 
 SRC = $(wildcard $(SRCDIR)/*.c)
 OBJS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRC))
@@ -29,6 +31,7 @@ TESTS = $(patsubst %.c,%,$(_TESTS))
 
 ${APPNAME}: $(OBJS)
 	$(CC) -o $(BIN) $(APP) $(OBJS) $(CFLAGS) $(LDFLAGS)
+	ln -sf $(BIN) grace
 
 ${OBJDIR}/%.o: $(SRCDIR)/%.c
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -54,3 +57,6 @@ clean:
 
 dirs:
 	mkdir -p ${APPDIR} ${BINDIR} ${SRCDIR} ${INCLUDEDIR} ${LEXDIR} ${YACCDIR} ${OBJDIR} ${TESTDIR} ${GDIR} ${YOUTDIR}
+
+examples:
+	$(shell for i in $(EXAMPLES); do ./grace < $$i; echo "./grace < "$$i; done)

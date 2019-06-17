@@ -11,16 +11,16 @@ list* create_ll(int t_size){
         return NULL;
     }
     // val->capacity = capacity;
-    #ifdef DEBUG
-        fprintf(stderr, "[INFO] - can access capacity value\n");
-    #endif
+    // #ifdef DEBUG
+    //     fprintf(stderr, "[INFO] - can access capacity value\n");
+    // #endif
     val->t_size = t_size;
     #ifdef DEBUG
-        fprintf(stderr, "[INFO] - can access t_size value\n");
+        fprintf(stderr, "[INFO] - can access t_size value (%i)\n", val->t_size);
     #endif
     val->size = 0;
     #ifdef DEBUG
-        fprintf(stderr, "[INFO] - can access size value\n");
+        fprintf(stderr, "[INFO] - can access size value (%i)\n", val->size);
     #endif
     val->head = NULL;
     #ifdef DEBUG
@@ -41,6 +41,10 @@ list* create_ll(int t_size){
     val->remove = remove_from_ll;
     #ifdef DEBUG
         fprintf(stderr, "[INFO] - init remove method\n");
+    #endif
+    val->merge = merge_lls;
+    #ifdef DEBUG
+        fprintf(stderr, "[INFO] - init merge method\n");
     #endif
     val->clean = clean_ll;
     #ifdef DEBUG
@@ -82,7 +86,8 @@ int push_in_ll(list* ll, void* val){
     ll->tail = item;
     ll->size++;
     #ifdef DEBUG
-        fprintf(stderr, "[INFO] - Value %i inserted\n", (*item).value);
+        // fprintf(stderr, "[INFO] - Value %s inserted\n", ((ht_node*)((*item).value))->key);
+        fprintf(stderr, "[INFO] - List size = %i\n", ll->size);
     #endif
     return 1;
 }
@@ -190,6 +195,33 @@ void* remove_from_ll(list* ll, int index){
         return value;
     }
     return LISTEND;
+}
+
+list* merge_lls(list* ll1, list* ll2){
+    if (ll1 == NULL) {
+        return ll2;
+    }
+    if (ll2 == NULL) {
+        return ll1;
+    }
+    if (ll1->t_size != ll2->t_size) {
+        fprintf(stderr, "[ERROR] - Invalid list types");
+        return NULL;
+    }
+    
+    list* val = ll1;
+    if (val == NULL) {
+        fprintf(stderr, "[ERROR] - malloc not initializing list");
+        return NULL;
+    }
+
+    val->tail->next = ll2->head;
+    ll2->head->prev = val->tail;
+    val->tail = ll2->tail;
+    val->size += ll2->size;
+
+    free(ll2);
+    return val;
 }
 
 int clean_ll(list* ll){
