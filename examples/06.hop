@@ -67,7 +67,7 @@ puts("Please input the numbers to insert (blank to stop)")
 int[] numbers
 
 loop
-  string input = gets()
+  str input = gets()
   if input.empty then
     break
   end_if

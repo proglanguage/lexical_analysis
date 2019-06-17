@@ -42,6 +42,10 @@ list* create_ll(int t_size){
     #ifdef DEBUG
         fprintf(stderr, "[INFO] - init remove method\n");
     #endif
+    val->merge = merge_lls;
+    #ifdef DEBUG
+        fprintf(stderr, "[INFO] - init merge method\n");
+    #endif
     val->clean = clean_ll;
     #ifdef DEBUG
         fprintf(stderr, "[INFO] - init clean method\n");
@@ -190,6 +194,27 @@ void* remove_from_ll(list* ll, int index){
         return value;
     }
     return LISTEND;
+}
+
+list* merge_lls(list* ll1, list* ll2){
+    if (ll1->t_size != ll2->t_size) {
+        fprintf(stderr, "[ERROR] - Invalid list types");
+        return NULL;
+    }
+    
+    list* val = ll1;
+    if (val == NULL) {
+        fprintf(stderr, "[ERROR] - malloc not initializing list");
+        return NULL;
+    }
+
+    val->tail->next = ll2->head;
+    ll2->head->prev = val->tail;
+    val->tail = ll2->tail;
+    val->size += ll2->size;
+
+    free(ll2);
+    return val;
 }
 
 int clean_ll(list* ll){
