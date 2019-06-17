@@ -54,6 +54,7 @@ extern int yycolno;
 %token LEFT_KEY RIGHT_KEY
 %token COMMA
 %token DOT
+%token AMPERSAND
 %token ENDL
 %token INDENT
 %token EXIT
@@ -68,7 +69,7 @@ extern int yycolno;
 
  /* OPERATORS */
 %token ASSIGN
-%token PLUS MINUS TIMES DIVIDE  POWER
+%token PLUS MINUS TIMES DIVIDE POWER MODULUS
 %token LESS_EQ BIG_EQ LESS BIG EQ NEQ
 %token AND OR NEG
 
@@ -83,7 +84,10 @@ extern int yycolno;
 %start stmts
 
  /* %left INTEGER CHAR STRING */
- /*%type <npValue> stms stm exp term block type ids array_op params param declare // comment */
+%right '='
+%left '+' '-'
+%left '*' '/' '%'
+%type <npValue> stmts exp term type ids array_op params param declare
 
 %%
 
@@ -151,6 +155,7 @@ id: ID                      {printf("reduce to id\n");}
   ;
 
 declare: types ids                 {printf("reduce to declare\n");}
+       | ids ids
        | types ids ASSIGN exps     {printf("reduce to declare with assign\n");}
        ;
 
@@ -159,7 +164,7 @@ params:                                                {}
       | params COMMA param                             {printf("reduce to params\n");}
       ;
 
-param: types ID                          {printf("reduce to param\n");}
+param: types id                          {printf("reduce to param\n");}
      | id id                             {printf("reduce to param\n");}
      ;
 
@@ -168,20 +173,21 @@ exps: exp              {printf("reduce to exp\n");}
     ;
 
 exp: term                                        {printf("reduce to term\n");}
-   | exp PLUS term                               {printf("reduce to adition\n");}
-   | exp TIMES term                              {printf("reduce to multiplication\n");}
-   | exp DIVIDE term                             {printf("reduce to division\n");}
-   | exp MINUS term                              {printf("reduce to subtraction\n");}
-   | exp POWER term                              {printf("reduce to power\n");}
-   | exp LESS term                               {printf("reduce to less\n");}
-   | exp LESS_EQ term                            {printf("reduce to less equal\n");}
-   | exp BIG term                                {printf("reduce to big\n");}
-   | exp BIG_EQ term                             {printf("reduce to big equal\n");}
-   | exp EQ term                                 {printf("reduce to equal\n");}
-   | exp NEQ term                                {printf("reduce to not equal\n");}
+   | exp PLUS exp                                {printf("reduce to adition\n");}
+   | exp TIMES exp                               {printf("reduce to multiplication\n");}
+   | exp DIVIDE exp                              {printf("reduce to division\n");}
+   | exp MINUS exp                               {printf("reduce to subtraction\n");}
+   | exp POWER exp                               {printf("reduce to power\n");}
+   | exp MODULUS exp                             {printf("reduce to modulus\n");}
+   | exp LESS exp                                {printf("reduce to less\n");}
+   | exp LESS_EQ exp                             {printf("reduce to less equal\n");}
+   | exp BIG exp                                 {printf("reduce to big\n");}
+   | exp BIG_EQ exp                              {printf("reduce to big equal\n");}
+   | exp EQ exp                                  {printf("reduce to equal\n");}
+   | exp NEQ exp                                 {printf("reduce to not equal\n");}
    | NEG exp                                     {printf("reduce to negate\n");}
-   | exp AND term                                {printf("reduce to and\n");}
-   | exp OR term                                 {printf("reduce to or\n");}
+   | exp AND exp                                 {printf("reduce to and\n");}
+   | exp OR exp                                  {printf("reduce to or\n");}
    | exp DOT term                                {printf("reduce to dot\n");}
    | exp COMMA term                              {printf("reduce to comma\n");}
    | exp PLUS PLUS                               {printf("reduce to assign++\n");}
@@ -204,6 +210,8 @@ type: INTEGER    {printf("reduce to int\n");}
 
 numeral: NUMBER             {printf("reduce to number\n");}
        | FLOAT_NUMBER       {printf("reduce to float_number\n");}
+       | MINUS NUMBER       {printf("reduce to negative number\n");}
+       | MINUS FLOAT_NUMBER {printf("reduce to negative float number\n");}
        ;
 
 bool: TRUE  {printf("reduce to true\n");}

@@ -1,0 +1,80 @@
+BinaryTree : struct {
+  int value
+  BinaryTree lst
+  BinaryTree rst
+}
+
+BinaryTree function search(BinaryTree tree, int value)
+  if (tree == null) or (tree.value == value) then
+    return tree
+  else if value < tree.value then
+    return search(tree.lst, value)
+  else
+    return search(tree.rst, value)
+  end_if
+end_function
+
+procedure insert(BinaryTree tree, int value)
+  if tree.value == null then
+    tree.value = value
+  else if value <= tree.value then
+    insert(tree.lst, value)
+  else
+    insert(tree.rst, value)
+  end_if
+end_procedure
+
+BinaryTree function make_tree(int[] numbers)
+  BinaryTree tree
+
+  for i in numbers
+    insert(tree, i)
+  end_for
+
+  return tree
+end_function
+
+procedure print_max(BinaryTree tree, int level)
+  if tree.rst == null then
+    puts("Maximum value: %d, found at level: %d", tree.value, level)
+  else
+    print_max(tree.rst, level + 1)
+  end_if
+end_procedure
+
+procedure print_min(BinaryTree tree, int level)
+  if tree.lst == null then
+    puts("Minimum value: %d, found at level: %d", tree.value, level)
+  else
+    print_min(tree.lst, level + 1)
+  end_if
+end_procedure
+
+procedure print_tree(BinaryTree tree, int level)
+  if tree.value == null then
+    # noop
+    return
+  else
+    print("\n%d", tree.value)
+    print_tree(tree.lst)
+    print_tree(tree.rst)
+  end_if
+end_procedure
+
+# Begin main
+
+puts("Please input the numbers to insert (blank to stop)")
+int[] numbers
+
+loop
+  string input = gets()
+  if input.empty then
+    break
+  end_if
+  int number = (int) input
+  numbers.append(number)
+end_loop
+
+BinaryTree tree = make_tree(numbers)
+print_min(tree)
+print_max(tree)
